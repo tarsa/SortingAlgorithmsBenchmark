@@ -79,16 +79,21 @@ namespace tarsa {
                 siftDown<ItemType, compOp>(a, start, count);
             }
         }
-
+        
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
-        void heapsort(ItemType * const a, ssize_t const count) {
-            heapify<ItemType, compOp>(a, count);
+        void drainHeap(ItemType * const a, ssize_t const count) {
             ssize_t end = count;
             while (end > 1) {
                 std::swap(a[end], a[1]);
                 end--;
                 siftDown<ItemType, compOp>(a, 1, end);
             }
+        }
+
+        template<typename ItemType, ComparisonOperator<ItemType> compOp>
+        void heapsort(ItemType * const a, ssize_t const count) {
+            heapify<ItemType, compOp>(a, count);
+            drainHeap<ItemType, compOp>(a, count);
         }
     }
 
