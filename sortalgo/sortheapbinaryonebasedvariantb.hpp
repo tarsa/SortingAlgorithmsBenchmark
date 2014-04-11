@@ -37,19 +37,22 @@ namespace tarsa {
             while (root * 2 + 1 <= end) {
                 ssize_t const left = root * 2;
                 ssize_t const right = left + 1;
-                ssize_t max = root;
 
-                if (compOp(a[max], Below, a[left])) {
-                    max = left;
-                }
-                if (compOp(a[max], Below, a[right])) {
-                    max = right;
-                }
-                if (max != root) {
-                    std::swap(a[root], a[max]);
-                    root = max;
+                if (compOp(a[root], Below, a[left])) {
+                    if (compOp(a[left], Below, a[right])) {
+                        std::swap(a[root], a[right]);
+                        root = right;
+                    } else {
+                        std::swap(a[root], a[left]);
+                        root = left;
+                    }
                 } else {
-                    return;
+                    if (compOp(a[root], Below, a[right])) {
+                        std::swap(a[root], a[right]);
+                        root = right;
+                    } else {
+                        return;
+                    }
                 }
             }
             if (root * 2 == end) {
@@ -66,7 +69,7 @@ namespace tarsa {
                 siftDown<ItemType, compOp>(a, start, count);
             }
         }
-        
+
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
             ssize_t end = count;

@@ -55,30 +55,39 @@ namespace tarsa {
                 while (relativeLeft < clusterSize) {
                     ssize_t const relativeRight = relativeLeft + 1;
 
-                    ssize_t max = relativeRoot;
-
                     if (relativeRight < relativeClusterEnd) {
-                        if (compOp(cluster[max], Below,
+                        if (compOp(cluster[relativeRoot], Below,
                                 cluster[relativeLeft])) {
-                            max = relativeLeft;
+                            if (compOp(cluster[relativeLeft], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeRight]);
+                                relativeRoot = relativeRight;
+                            } else {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeLeft]);
+                                relativeRoot = relativeLeft;
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeRight]);
+                                relativeRoot = relativeRight;
+                            } else {
+                                return;
+                            }
                         }
-                        if (compOp(cluster[max], Below,
-                                cluster[relativeRight])) {
-                            max = relativeRight;
-                        }
-                    } else if (relativeLeft < relativeClusterEnd && compOp(
-                            cluster[max], Below, cluster[relativeLeft])) {
-                        max = relativeLeft;
                     } else {
+                        if (relativeLeft < relativeClusterEnd &&
+                                compOp(cluster[relativeRoot], Below,
+                                cluster[relativeLeft])) {
+                            std::swap(cluster[relativeRoot],
+                                    cluster[relativeLeft]);
+                        }
                         return;
                     }
-                    if (max != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[max]);
-                        relativeRoot = max;
-                        relativeLeft = (relativeRoot + 1) * arity;
-                    } else {
-                        return;
-                    }
+                    relativeLeft = (relativeRoot + 1) * arity;
                 }
                 root = clusterStart + relativeRoot;
                 {
@@ -88,24 +97,27 @@ namespace tarsa {
                             + globalLevelStart + globalLevelSize;
                     ssize_t const right = left + 1;
 
-                    ssize_t max = root;
-
                     if (right < count) {
-                        if (compOp(a[max], Below, a[left])) {
-                            max = left;
+                        if (compOp(a[root], Below, a[left])) {
+                            if (compOp(a[left], Below, a[right])) {
+                                std::swap(a[root], a[right]);
+                                root = right;
+                            } else {
+                                std::swap(a[root], a[left]);
+                                root = left;
+                            }
+                        } else {
+                            if (compOp(a[root], Below, a[right])) {
+                                std::swap(a[root], a[right]);
+                                root = right;
+                            } else {
+                                return;
+                            }
                         }
-                        if (compOp(a[max], Below, a[right])) {
-                            max = right;
+                    } else {
+                        if (left < count && compOp(a[root], Below, a[left])) {
+                            std::swap(a[root], a[left]);
                         }
-                    } else if (left < count && compOp(a[max], Below, a[left])) {
-                        max = left;
-                    } else {
-                        return;
-                    }
-                    if (max != root) {
-                        std::swap(a[root], a[max]);
-                        root = max;
-                    } else {
                         return;
                     }
 
@@ -136,24 +148,27 @@ namespace tarsa {
                 {
                     ssize_t const right = left + 1;
 
-                    ssize_t max = root;
-
                     if (right < count) {
-                        if (compOp(a[max], Below, a[left])) {
-                            max = left;
+                        if (compOp(a[root], Below, a[left])) {
+                            if (compOp(a[left], Below, a[right])) {
+                                std::swap(a[root], a[right]);
+                                root = right;
+                            } else {
+                                std::swap(a[root], a[left]);
+                                root = left;
+                            }
+                        } else {
+                            if (compOp(a[root], Below, a[right])) {
+                                std::swap(a[root], a[right]);
+                                root = right;
+                            } else {
+                                return;
+                            }
                         }
-                        if (compOp(a[max], Below, a[right])) {
-                            max = right;
+                    } else {
+                        if (left < count && compOp(a[root], Below, a[left])) {
+                            std::swap(a[root], a[left]);
                         }
-                    } else if (left < count && compOp(a[max], Below, a[left])) {
-                        max = left;
-                    } else {
-                        return;
-                    }
-                    if (max != root) {
-                        std::swap(a[root], a[max]);
-                        root = max;
-                    } else {
                         return;
                     }
 
@@ -172,30 +187,39 @@ namespace tarsa {
                 while (relativeLeft < clusterSize) {
                     ssize_t const relativeRight = relativeLeft + 1;
 
-                    ssize_t max = relativeRoot;
-
                     if (relativeRight < relativeClusterEnd) {
-                        if (compOp(cluster[max], Below,
+                        if (compOp(cluster[relativeRoot], Below,
                                 cluster[relativeLeft])) {
-                            max = relativeLeft;
+                            if (compOp(cluster[relativeLeft], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeRight]);
+                                relativeRoot = relativeRight;
+                            } else {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeLeft]);
+                                relativeRoot = relativeLeft;
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeRoot],
+                                        cluster[relativeRight]);
+                                relativeRoot = relativeRight;
+                            } else {
+                                return;
+                            }
                         }
-                        if (compOp(cluster[max], Below,
-                                cluster[relativeRight])) {
-                            max = relativeRight;
-                        }
-                    } else if (relativeLeft < relativeClusterEnd && compOp(
-                            cluster[max], Below, cluster[relativeLeft])) {
-                        max = relativeLeft;
                     } else {
+                        if (relativeLeft < relativeClusterEnd &&
+                                compOp(cluster[relativeRoot], Below,
+                                cluster[relativeLeft])) {
+                            std::swap(cluster[relativeRoot],
+                                    cluster[relativeLeft]);
+                        }
                         return;
                     }
-                    if (max != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[max]);
-                        relativeRoot = max;
-                        relativeLeft = (relativeRoot + 1) * arity;
-                    } else {
-                        return;
-                    }
+                    relativeLeft = (relativeRoot + 1) * arity;
                 }
                 root = clusterStart + relativeRoot;
                 left = (clusterStart - globalLevelStart)

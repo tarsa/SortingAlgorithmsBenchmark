@@ -56,31 +56,38 @@ namespace tarsa {
                     ssize_t const relativeLeft = relativeItem * arity + 1;
                     ssize_t const relativeRight = relativeItem * arity + 2;
 
-                    ssize_t max = relativeItem;
-
                     if (relativeRight < relativeEnd) {
-                        if (compOp(cluster[max], Below,
+                        if (compOp(cluster[relativeItem], Below,
                                 cluster[relativeLeft])) {
-                            max = relativeLeft;
+                            if (compOp(cluster[relativeLeft], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeItem],
+                                        cluster[relativeRight]);
+                                relativeItem = relativeRight;
+                            } else {
+                                std::swap(cluster[relativeItem],
+                                        cluster[relativeLeft]);
+                                relativeItem = relativeLeft;
+                            }
+                        } else {
+                            if (compOp(cluster[relativeItem], Below,
+                                    cluster[relativeRight])) {
+                                std::swap(cluster[relativeItem],
+                                        cluster[relativeRight]);
+                                relativeItem = relativeRight;
+                            } else {
+                                return;
+                            }
                         }
-                        if (compOp(cluster[max], Below,
-                                cluster[relativeRight])) {
-                            max = relativeRight;
-                        }
-                    } else if (relativeLeft < relativeEnd &&
-                            compOp(cluster[max], Below,
-                            cluster[relativeLeft])) {
-                        max = relativeLeft;
                     } else {
+                        if (relativeLeft < relativeEnd && compOp(
+                                cluster[relativeItem], Below,
+                                cluster[relativeLeft])) {
+                            std::swap(cluster[relativeItem],
+                                    cluster[relativeLeft]);
+                        }
                         return;
                     }
-                    if (max != relativeItem) {
-                        std::swap(cluster[relativeItem], cluster[max]);
-                        relativeItem = max;
-                    } else {
-                        return;
-                    }
-
                 }
                 item = clusterStart + relativeItem;
                 {

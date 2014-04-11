@@ -31,28 +31,62 @@ namespace tarsa {
     namespace privateOneBasedTernaryHeapSortVariantA {
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
-        void siftDown(ItemType * const a, ssize_t const  start, 
+        void siftDown(ItemType * const a, ssize_t const start,
                 ssize_t const end) {
             ssize_t root = start;
-            while (root * 3 - 1 <= end) {
+            while (true) {
                 ssize_t const first = root * 3 - 1;
                 ssize_t const middle = first + 1;
                 ssize_t const last = middle + 1;
-                ssize_t biggest = root;
 
-                if (compOp(a[biggest], Below, a[first])) {
-                    biggest = first;
-                }
-                if (middle <= end && compOp(a[biggest], Below, a[middle])) {
-                    biggest = middle;
-                }
-                if (last <= end && compOp(a[biggest], Below, a[last])) {
-                    biggest = last;
-                }
-                if (biggest != root) {
-                    std::swap(a[root], a[biggest]);
-                    root = biggest;
+                if (last <= end) {
+                    if (compOp(a[root], Below, a[first])) {
+                        if (compOp(a[first], Below, a[middle])) {
+                            if (compOp(a[middle], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[middle]);
+                                root = middle;
+                            }
+                        } else {
+                            if (compOp(a[first], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[first]);
+                                root = first;
+                            }
+                        }
+                    } else {
+                        if (compOp(a[root], Below, a[middle])) {
+                            if (compOp(a[middle], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[middle]);
+                                root = middle;
+                            }
+                        } else {
+                            if (compOp(a[root], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                return;
+                            }
+                        }
+                    }
                 } else {
+                    ssize_t biggest = root;
+                    if (first <= end && compOp(a[biggest], Below, a[first])) {
+                        biggest = first;
+                    }
+                    if (middle <= end && compOp(a[biggest], Below, a[middle])) {
+                        biggest = middle;
+                    }
+                    if (biggest != root) {
+                        std::swap(a[root], a[biggest]);
+                    }
                     return;
                 }
             }
@@ -64,7 +98,7 @@ namespace tarsa {
                 siftDown<ItemType, compOp>(a, start, count);
             }
         }
-        
+
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
             ssize_t end = count;
@@ -83,17 +117,17 @@ namespace tarsa {
     }
 
     template<typename ItemType, ComparisonOperator<ItemType> compOp>
-    void OneBasedTernaryHeapSortVariantA(ItemType * const a, 
+    void OneBasedTernaryHeapSortVariantA(ItemType * const a,
             ssize_t const count) {
         privateOneBasedTernaryHeapSortVariantA::heapsort<ItemType, compOp>(
                 a - 1, count);
     }
 
     template<typename ItemType>
-    void OneBasedTernaryHeapSortVariantA(ItemType * const a, 
+    void OneBasedTernaryHeapSortVariantA(ItemType * const a,
             ssize_t const count) {
         OneBasedTernaryHeapSortVariantA<ItemType, genericComparisonOperator>(
-        a, count);
+                a, count);
     }
 }
 

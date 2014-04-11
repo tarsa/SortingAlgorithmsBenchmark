@@ -39,40 +39,102 @@ namespace tarsa {
                 ssize_t const child2 = child1 + 1;
                 ssize_t const child3 = child2 + 1;
                 ssize_t const child4 = child3 + 1;
-                ssize_t biggest = root;
 
                 if (child4 <= last) {
-                    if (compOp(a[biggest], Below, a[child1])) {
-                        biggest = child1;
-                    }
-                    if (compOp(a[biggest], Below, a[child2])) {
-                        biggest = child2;
-                    }
-                    if (compOp(a[biggest], Below, a[child3])) {
-                        biggest = child3;
-                    }
-                    if (compOp(a[biggest], Below, a[child4])) {
-                        biggest = child4;
-                    }
-                } else if (child1 <= last) {
-                    if (compOp(a[biggest], Below, a[child1])) {
-                        biggest = child1;
-                    }
-                    if (child2 <= last &&
-                            compOp(a[biggest], Below, a[child2])) {
-                        biggest = child2;
-                    }
-                    if (child3 <= last &&
-                            compOp(a[biggest], Below, a[child3])) {
-                        biggest = child3;
+                    if (compOp(a[root], Below, a[child1])) {
+                        if (compOp(a[child1], Below, a[child2])) {
+                            if (compOp(a[child2], Below, a[child3])) {
+                                if (compOp(a[child3], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child3]);
+                                    root = child3;
+                                }
+                            } else {
+                                if (compOp(a[child2], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child2]);
+                                    root = child2;
+                                }
+                            }
+                        } else {
+                            if (compOp(a[child1], Below, a[child3])) {
+                                if (compOp(a[child3], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child3]);
+                                    root = child3;
+                                }
+                            } else {
+                                if (compOp(a[child1], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child1]);
+                                    root = child1;
+                                }
+                            }
+                        }
+                    } else {
+                        if (compOp(a[root], Below, a[child2])) {
+                            if (compOp(a[child2], Below, a[child3])) {
+                                if (compOp(a[child3], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child3]);
+                                    root = child3;
+                                }
+                            } else {
+                                if (compOp(a[child2], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child2]);
+                                    root = child2;
+                                }
+                            }
+                        } else {
+                            if (compOp(a[root], Below, a[child3])) {
+                                if (compOp(a[child3], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    std::swap(a[root], a[child3]);
+                                    root = child3;
+                                }
+                            } else {
+                                if (compOp(a[root], Below, a[child4])) {
+                                    std::swap(a[root], a[child4]);
+                                    root = child4;
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
                     }
                 } else {
-                    return;
-                }
-                if (biggest != root) {
-                    std::swap(a[root], a[biggest]);
-                    root = biggest;
-                } else {
+                    ssize_t biggest = root;
+                    if (child1 <= last) {
+                        if (compOp(a[biggest], Below, a[child1])) {
+                            biggest = child1;
+                        }
+                        if (child2 <= last &&
+                                compOp(a[biggest], Below, a[child2])) {
+                            biggest = child2;
+                        }
+                        if (child3 <= last &&
+                                compOp(a[biggest], Below, a[child3])) {
+                            biggest = child3;
+                        }
+                        if (biggest != root) {
+                            std::swap(a[root], a[biggest]);
+                        }
+                    }
                     return;
                 }
             }
