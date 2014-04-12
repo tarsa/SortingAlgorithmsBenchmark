@@ -76,20 +76,18 @@ namespace tarsa {
                     }
                 }
             }
-            if (root * 3 - 1 <= end) {
+            {
                 ssize_t const first = root * 3 - 1;
                 ssize_t const middle = first + 1;
                 ssize_t biggest = root;
 
-                if (compOp(a[biggest], Below, a[first])) {
+                if (first <= end && compOp(a[biggest], Below, a[first])) {
                     biggest = first;
                 }
                 if (middle <= end && compOp(a[biggest], Below, a[middle])) {
                     biggest = middle;
                 }
-                if (biggest != root) {
-                    std::swap(a[root], a[biggest]);
-                }
+                std::swap(a[root], a[biggest]);
             }
         }
 

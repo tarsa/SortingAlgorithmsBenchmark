@@ -84,9 +84,7 @@ namespace tarsa {
                     if (middle <= end && compOp(a[biggest], Below, a[middle])) {
                         biggest = middle;
                     }
-                    if (biggest != root) {
-                        std::swap(a[root], a[biggest]);
-                    }
+                    std::swap(a[root], a[biggest]);
                     return;
                 }
             }

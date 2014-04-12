@@ -132,22 +132,19 @@ namespace tarsa {
                     }
                 } else {
                     ssize_t biggest = root;
-                    if (child1 <= last) {
-                        if (compOp(a[biggest], Below, a[child1])) {
-                            biggest = child1;
-                        }
-                        if (child2 <= last &&
-                                compOp(a[biggest], Below, a[child2])) {
-                            biggest = child2;
-                        }
-                        if (child3 <= last &&
-                                compOp(a[biggest], Below, a[child3])) {
-                            biggest = child3;
-                        }
-                        if (biggest != root) {
-                            std::swap(a[root], a[biggest]);
-                        }
+                    if (child1 <= last && 
+                            compOp(a[biggest], Below, a[child1])) {
+                        biggest = child1;
                     }
+                    if (child2 <= last &&
+                            compOp(a[biggest], Below, a[child2])) {
+                        biggest = child2;
+                    }
+                    if (child3 <= last &&
+                            compOp(a[biggest], Below, a[child3])) {
+                        biggest = child3;
+                    }
+                    std::swap(a[root], a[biggest]);
                     return;
                 }
             }
