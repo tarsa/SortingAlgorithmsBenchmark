@@ -11,6 +11,8 @@
       <itemPath>sortalgo/sortheapbinaryonebasedvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortheapquaternaryvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapquaternaryvariantb.hpp</itemPath>
+      <itemPath>sortalgo/sortheapternaryclusteredvarianta.hpp</itemPath>
+      <itemPath>sortalgo/sortheapternaryclusteredvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryonebasedvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryonebasedvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortquickrandomized.hpp</itemPath>
@@ -94,6 +96,16 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="sortalgo/sortheapternaryclusteredvarianta.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapternaryclusteredvariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="sortalgo/sortheapternaryonebasedvarianta.hpp"
             ex="false"
             tool="3"
@@ -163,6 +175,16 @@
             flavor2="0">
       </item>
       <item path="sortalgo/sortheapquaternaryvariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapternaryclusteredvarianta.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapternaryclusteredvariantb.hpp"
             ex="false"
             tool="3"
             flavor2="0">

@@ -37,6 +37,8 @@ int64_t counter;
 #include "sortalgo/sortheapbinaryonebasedvariantb.hpp"
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
+#include "sortalgo/sortheapternaryclusteredvarianta.hpp"
+#include "sortalgo/sortheapternaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapternaryonebasedvarianta.hpp"
 #include "sortalgo/sortheapternaryonebasedvariantb.hpp"
 #include "sortalgo/sortquickrandomized.hpp"
@@ -80,7 +82,7 @@ void testFunction(std::string name, ItemType const * const original,
 }
 
 int main(int argc, char** argv) {
-    ssize_t size = 123456789;
+    ssize_t size = 12345678;
 
     srand(7);
     typ * original = new typ[size];
@@ -92,7 +94,7 @@ int main(int argc, char** argv) {
 
     testFunction("StdSort", original, work, size, [&]() {
         std::sort(work, work + size); });
-        
+
     testFunction("ClusteredBinaryHeapSortVariantA", original, work, size,
             [&]() {
                 ClusteredBinaryHeapSortVariantA<typ, ComparisonOperator>(
@@ -103,7 +105,7 @@ int main(int argc, char** argv) {
             [&]() {
                 ClusteredBinaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
-            });        
+            });
 
     testFunction("OneBasedBinaryHeapSortVariantA", original, work, size,
             [&]() {
@@ -128,6 +130,18 @@ int main(int argc, char** argv) {
                 QuaternaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
+
+    testFunction("ClusteredTernaryHeapSortVariantA", original, work, size,
+            [&]() {
+                ClusteredTernaryHeapSortVariantA<typ, ComparisonOperator>(
+                        work, size);
+            });
+            
+    testFunction("ClusteredTernaryHeapSortVariantB", original, work, size,
+            [&]() {
+                ClusteredTernaryHeapSortVariantB<typ, ComparisonOperator>(
+                        work, size);
+            });            
 
     testFunction("OneBasedTernaryHeapSortVariantA", original, work, size,
             [&]() {
