@@ -323,7 +323,7 @@ namespace tarsa {
     }
 
     template<typename ItemType, ComparisonOperator<ItemType> compOp,
-    ssize_t clusterLevels = 4 >
+    ssize_t clusterLevels = 5 >
     void ClusteredBinaryHeapSortVariantB(ItemType * const a,
             ssize_t const count) {
         privateClusteredBinaryHeapSortVariantB::
