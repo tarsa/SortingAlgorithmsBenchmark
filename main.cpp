@@ -92,6 +92,18 @@ int main(int argc, char** argv) {
 
     testFunction("StdSort", original, work, size, [&]() {
         std::sort(work, work + size); });
+        
+    testFunction("ClusteredBinaryHeapSortVariantA", original, work, size,
+            [&]() {
+                ClusteredBinaryHeapSortVariantA<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("ClusteredBinaryHeapSortVariantB", original, work, size,
+            [&]() {
+                ClusteredBinaryHeapSortVariantB<typ, ComparisonOperator>(
+                        work, size);
+            });        
 
     testFunction("OneBasedBinaryHeapSortVariantA", original, work, size,
             [&]() {
@@ -104,18 +116,6 @@ int main(int argc, char** argv) {
                 OneBasedBinaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
-
-    testFunction("ClusteredBinaryHeapSortVariantA", original, work, size,
-            [&]() {
-                ClusteredBinaryHeapSortVariantA<typ, ComparisonOperator>(
-                        work, size);
-            });
-            
-    testFunction("ClusteredBinaryHeapSortVariantB", original, work, size,
-            [&]() {
-                ClusteredBinaryHeapSortVariantB<typ, ComparisonOperator>(
-                        work, size);
-            });            
 
     testFunction("QuaternaryHeapSortVariantA", original, work, size,
             [&]() {
