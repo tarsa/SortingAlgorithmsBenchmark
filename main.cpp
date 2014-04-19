@@ -35,6 +35,7 @@ int64_t counter;
 #include "sortalgo/sortheapbinaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapbinaryonebasedvarianta.hpp"
 #include "sortalgo/sortheapbinaryonebasedvariantb.hpp"
+#include "sortalgo/sortheaphybrid.hpp"
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
 #include "sortalgo/sortheapternaryclusteredvarianta.hpp"
@@ -119,6 +120,12 @@ int main(int argc, char** argv) {
                         work, size);
             });
 
+    testFunction("HybridHeapSort", original, work, size,
+            [&]() {
+                HybridHeapSort<typ, ComparisonOperator>(
+                        work, size);
+            });
+
     testFunction("QuaternaryHeapSortVariantA", original, work, size,
             [&]() {
                 QuaternaryHeapSortVariantA<typ, ComparisonOperator>(
@@ -136,12 +143,12 @@ int main(int argc, char** argv) {
                 ClusteredTernaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
-            
+
     testFunction("ClusteredTernaryHeapSortVariantB", original, work, size,
             [&]() {
                 ClusteredTernaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
-            });            
+            });
 
     testFunction("OneBasedTernaryHeapSortVariantA", original, work, size,
             [&]() {
