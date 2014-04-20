@@ -24,8 +24,6 @@
 #ifndef SORTHEAPHYBRID_HPP
 #define	SORTHEAPHYBRID_HPP
 
-#include <cassert>
-
 #include "sortalgocommon.hpp"
 
 namespace tarsa {
@@ -64,27 +62,131 @@ namespace tarsa {
                     ssize_t const relativeChild3 = relativeChild2 + 1;
                     ssize_t const relativeChild4 = relativeChild3 + 1;
 
-                    ssize_t biggest = relativeRoot;
-                    if (relativeChild1 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild1])) {
-                        biggest = relativeChild1;
-                    }
-                    if (relativeChild2 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild2])) {
-                        biggest = relativeChild2;
-                    }
-                    if (relativeChild3 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild3])) {
-                        biggest = relativeChild3;
-                    }
-                    if (relativeChild4 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild4])) {
-                        biggest = relativeChild4;
-                    }
-                    if (biggest != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[biggest]);
-                        relativeRoot = biggest;
+                    if (relativeChild4 <= relativeLast) {
+                        if (compOp(cluster[relativeRoot], Below,
+                                cluster[relativeChild1])) {
+                            if (compOp(cluster[relativeChild1], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild2], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild2]);
+                                        relativeRoot = relativeChild2;
+                                    }
+                                }
+                            } else {
+                                if (compOp(cluster[relativeChild1], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild1], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild1]);
+                                        relativeRoot = relativeChild1;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild2], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild2]);
+                                        relativeRoot = relativeChild2;
+                                    }
+                                }
+                            } else {
+                                if (compOp(cluster[relativeRoot], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeRoot], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                     } else {
+                        ssize_t biggest = relativeRoot;
+                        if (relativeChild1 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild1])) {
+                            biggest = relativeChild1;
+                        }
+                        if (relativeChild2 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild2])) {
+                            biggest = relativeChild2;
+                        }
+                        if (relativeChild3 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild3])) {
+                            biggest = relativeChild3;
+                        }
+                        std::swap(cluster[biggest], cluster[relativeRoot]);
                         return;
                     }
                 }
@@ -94,23 +196,70 @@ namespace tarsa {
                     ssize_t const relativeChild2 = relativeChild1 + 1;
                     ssize_t const relativeChild3 = relativeChild2 + 1;
 
-                    ssize_t biggest = relativeRoot;
-                    if (relativeChild1 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild1])) {
-                        biggest = relativeChild1;
-                    }
-                    if (relativeChild2 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild2])) {
-                        biggest = relativeChild2;
-                    }
-                    if (relativeChild3 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild3])) {
-                        biggest = relativeChild3;
-                    }
-                    if (biggest != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[biggest]);
-                        relativeRoot = biggest;
+                    if (relativeChild3 < relativeLast) {
+                        if (compOp(cluster[relativeRoot], Below,
+                                cluster[relativeChild1])) {
+                            if (compOp(cluster[relativeChild1], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild2]);
+                                    relativeRoot = relativeChild2;
+                                }
+                            } else {
+                                if (compOp(cluster[relativeChild1], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild1]);
+                                    relativeRoot = relativeChild1;
+                                }
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild2]);
+                                    relativeRoot = relativeChild2;
+                                }
+                            } else {
+                                if (compOp(cluster[relativeRoot], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
                     } else {
+                        ssize_t biggest = relativeRoot;
+                        if (relativeChild1 < relativeLast &&
+                                compOp(cluster[biggest], Below,
+                                cluster[relativeChild1])) {
+                            biggest = relativeChild1;
+                        }
+                        if (relativeChild2 < relativeLast &&
+                                compOp(cluster[biggest], Below,
+                                cluster[relativeChild2])) {
+                            biggest = relativeChild2;
+                        }
+                        std::swap(cluster[relativeRoot], cluster[biggest]);
                         return;
                     }
                 }
@@ -138,23 +287,70 @@ namespace tarsa {
                     ssize_t const relativeChild2 = relativeChild1 + 1;
                     ssize_t const relativeChild3 = relativeChild2 + 1;
 
-                    ssize_t biggest = relativeRoot;
-                    if (relativeChild1 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild1])) {
-                        biggest = relativeChild1;
-                    }
-                    if (relativeChild2 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild2])) {
-                        biggest = relativeChild2;
-                    }
-                    if (relativeChild3 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild3])) {
-                        biggest = relativeChild3;
-                    }
-                    if (biggest != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[biggest]);
-                        relativeRoot = biggest;
+                    if (relativeChild3 < relativeLast) {
+                        if (compOp(cluster[relativeRoot], Below,
+                                cluster[relativeChild1])) {
+                            if (compOp(cluster[relativeChild1], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild2]);
+                                    relativeRoot = relativeChild2;
+                                }
+                            } else {
+                                if (compOp(cluster[relativeChild1], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild1]);
+                                    relativeRoot = relativeChild1;
+                                }
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild2]);
+                                    relativeRoot = relativeChild2;
+                                }
+                            } else {
+                                if (compOp(cluster[relativeRoot], Below,
+                                        cluster[relativeChild3])) {
+                                    std::swap(cluster[relativeRoot],
+                                            cluster[relativeChild3]);
+                                    relativeRoot = relativeChild3;
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
                     } else {
+                        ssize_t biggest = relativeRoot;
+                        if (relativeChild1 < relativeLast &&
+                                compOp(cluster[biggest], Below,
+                                cluster[relativeChild1])) {
+                            biggest = relativeChild1;
+                        }
+                        if (relativeChild2 < relativeLast &&
+                                compOp(cluster[biggest], Below,
+                                cluster[relativeChild2])) {
+                            biggest = relativeChild2;
+                        }
+                        std::swap(cluster[relativeRoot], cluster[biggest]);
                         return;
                     }
                 }
@@ -175,27 +371,131 @@ namespace tarsa {
                     ssize_t const relativeChild3 = relativeChild2 + 1;
                     ssize_t const relativeChild4 = relativeChild3 + 1;
 
-                    ssize_t biggest = relativeRoot;
-                    if (relativeChild1 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild1])) {
-                        biggest = relativeChild1;
-                    }
-                    if (relativeChild2 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild2])) {
-                        biggest = relativeChild2;
-                    }
-                    if (relativeChild3 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild3])) {
-                        biggest = relativeChild3;
-                    }
-                    if (relativeChild4 <= relativeLast && compOp(
-                            cluster[biggest], Below, cluster[relativeChild4])) {
-                        biggest = relativeChild4;
-                    }
-                    if (biggest != relativeRoot) {
-                        std::swap(cluster[relativeRoot], cluster[biggest]);
-                        relativeRoot = biggest;
+                    if (relativeChild4 <= relativeLast) {
+                        if (compOp(cluster[relativeRoot], Below,
+                                cluster[relativeChild1])) {
+                            if (compOp(cluster[relativeChild1], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild2], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild2]);
+                                        relativeRoot = relativeChild2;
+                                    }
+                                }
+                            } else {
+                                if (compOp(cluster[relativeChild1], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild1], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild1]);
+                                        relativeRoot = relativeChild1;
+                                    }
+                                }
+                            }
+                        } else {
+                            if (compOp(cluster[relativeRoot], Below,
+                                    cluster[relativeChild2])) {
+                                if (compOp(cluster[relativeChild2], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeChild2], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild2]);
+                                        relativeRoot = relativeChild2;
+                                    }
+                                }
+                            } else {
+                                if (compOp(cluster[relativeRoot], Below,
+                                        cluster[relativeChild3])) {
+                                    if (compOp(cluster[relativeChild3], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild3]);
+                                        relativeRoot = relativeChild3;
+                                    }
+                                } else {
+                                    if (compOp(cluster[relativeRoot], Below,
+                                            cluster[relativeChild4])) {
+                                        std::swap(cluster[relativeRoot],
+                                                cluster[relativeChild4]);
+                                        relativeRoot = relativeChild4;
+                                    } else {
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                     } else {
+                        ssize_t biggest = relativeRoot;
+                        if (relativeChild1 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild1])) {
+                            biggest = relativeChild1;
+                        }
+                        if (relativeChild2 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild2])) {
+                            biggest = relativeChild2;
+                        }
+                        if (relativeChild3 <= relativeLast && compOp(
+                                cluster[biggest], Below,
+                                cluster[relativeChild3])) {
+                            biggest = relativeChild3;
+                        }
+                        std::swap(cluster[biggest], cluster[relativeRoot]);
                         return;
                     }
                 }
@@ -211,20 +511,52 @@ namespace tarsa {
                 ssize_t const middle = first + 1;
                 ssize_t const last = middle + 1;
 
-                ssize_t biggest = root;
-                if (first < end && compOp(a[biggest], Below, a[first])) {
-                    biggest = first;
-                }
-                if (middle < end && compOp(a[biggest], Below, a[middle])) {
-                    biggest = middle;
-                }
-                if (last < end && compOp(a[biggest], Below, a[last])) {
-                    biggest = last;
-                }
-                if (biggest != root) {
-                    std::swap(a[root], a[biggest]);
-                    root = biggest;
+                if (last < end) {
+                    if (compOp(a[root], Below, a[first])) {
+                        if (compOp(a[first], Below, a[middle])) {
+                            if (compOp(a[middle], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[middle]);
+                                root = middle;
+                            }
+                        } else {
+                            if (compOp(a[first], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[first]);
+                                root = first;
+                            }
+                        }
+                    } else {
+                        if (compOp(a[root], Below, a[middle])) {
+                            if (compOp(a[middle], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                std::swap(a[root], a[middle]);
+                                root = middle;
+                            }
+                        } else {
+                            if (compOp(a[root], Below, a[last])) {
+                                std::swap(a[root], a[last]);
+                                root = last;
+                            } else {
+                                return;
+                            }
+                        }
+                    }
                 } else {
+                    ssize_t biggest = root;
+                    if (first < end && compOp(a[biggest], Below, a[first])) {
+                        biggest = first;
+                    }
+                    if (middle < end && compOp(a[biggest], Below, a[middle])) {
+                        biggest = middle;
+                    }
+                    std::swap(a[root], a[biggest]);
                     return;
                 }
             }
