@@ -63,14 +63,14 @@ void testFunction(std::string name, ItemType const * const original,
         ItemType * const work, ssize_t const size,
         std::function<void() > functionInTest) {
     std::cout << name << std::endl;
-    clock_t clockz;
 
     std::copy(original, original + size, work);
     counter = 0;
-    clockz = clock();
+    clock_t clocks = clock();
     functionInTest();
+    clocks = clock() - clocks;
     std::cout << counter << " comparisons" << std::endl;
-    std::cout << (clock() - clockz) << " clock ticks" << std::endl;
+    std::cout << clocks << " clock ticks" << std::endl;
 
     for (ssize_t i = 0; i + 1 < size; i++) {
         if (work[i] > work[i + 1]) {
