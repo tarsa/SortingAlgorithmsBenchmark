@@ -37,8 +37,7 @@ namespace tarsa {
         template<typename ItemType, ComparisonOperator<ItemType> compOp,
         ssize_t clusterLevels>
         void siftDown(ItemType * const a, ssize_t item, ssize_t const count,
-                ssize_t clusterStart, ssize_t globalLevelStart,
-                ssize_t globalLevelSize) {
+                ssize_t clusterStart) {
             ssize_t constexpr clusterSize =
                     computeClusterSize<clusterLevels>(arity);
             ssize_t constexpr clusterArity =
@@ -91,10 +90,9 @@ namespace tarsa {
                 }
                 item = clusterStart + relativeItem;
                 {
-                    ssize_t const left = (clusterStart - globalLevelStart)
-                            * clusterArity + (relativeItem
-                            - relativeLastLevelStart) * arity * clusterSize
-                            + globalLevelStart + globalLevelSize;
+                    ssize_t const left = clusterStart * clusterArity + (1 +
+                            (relativeItem - relativeLastLevelStart) * arity)
+                            * clusterSize;
                     ssize_t const right = left + clusterSize;
 
                     ssize_t max = item;
@@ -119,9 +117,6 @@ namespace tarsa {
                     }
 
                     clusterStart = item;
-
-                    globalLevelStart += globalLevelSize;
-                    globalLevelSize *= clusterArity;
                 }
                 relativeItem = 0;
             }
@@ -133,49 +128,19 @@ namespace tarsa {
             ssize_t const end = count;
             ssize_t constexpr clusterSize =
                     computeClusterSize<clusterLevels>(arity);
-            ssize_t constexpr clusterArity =
-                    computeClusterLevelSize<clusterLevels>(arity);
 
-            ssize_t globalLevelStart = 0;
-            ssize_t globalLevelSize = clusterSize;
-            while (globalLevelStart + globalLevelSize < end) {
-                globalLevelStart += globalLevelSize;
-                globalLevelSize *= clusterArity;
-            }
             ssize_t item = count - 1;
             ssize_t localClusterStart = item / clusterSize * clusterSize;
-            ssize_t localLevelStart = localClusterStart;
-            ssize_t localLevelSize = 1;
-            ssize_t localLevel = 0;
-            while (localLevelStart + localLevelSize <= item) {
-                localLevelStart += localLevelSize;
-                localLevelSize *= arity;
-                localLevel++;
-            }
             while (true) {
-                while (localLevel >= 0) {
-                    while (item >= localLevelStart) {
-                        siftDown<ItemType, compOp, clusterLevels>(a, item, end,
-                                localClusterStart, globalLevelStart,
-                                globalLevelSize);
-                        item--;
-                    }
-                    localLevel--;
-                    localLevelSize /= arity;
-                    localLevelStart -= localLevelSize;
+                while (item >= localClusterStart) {
+                    siftDown<ItemType, compOp, clusterLevels>(a, item, end,
+                            localClusterStart);
+                    item--;
                 }
                 if (item < 0) {
                     break;
                 }
-                if (item < globalLevelStart) {
-                    globalLevelSize /= clusterArity;
-                    globalLevelStart -= globalLevelSize;
-                }
                 localClusterStart -= clusterSize;
-                localLevel = clusterLevels - 1;
-                localLevelSize =
-                        computeClusterLevelSize < clusterLevels - 1 > (arity);
-                localLevelStart -= localLevelSize;
             }
         }
 
@@ -186,8 +151,7 @@ namespace tarsa {
             while (last > 0) {
                 std::swap(a[last], a[0]);
                 last--;
-                siftDown<ItemType, compOp, clusterLevels>(a, 0, last + 1,
-                        0, 0, computeClusterSize<clusterLevels>(arity));
+                siftDown<ItemType, compOp, clusterLevels>(a, 0, last + 1, 0);
             }
         }
 
