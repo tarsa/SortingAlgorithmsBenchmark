@@ -364,31 +364,28 @@ namespace tarsa {
             ssize_t item = count - 1;
             ssize_t localClusterStart = item / clusterSize * clusterSize;
             ssize_t left = localClusterStart * clusterArity;
+            ssize_t relativeLeft = clusterSize - arity;
             if (item >= localClusterStart + relativeLastLevelStart) {
                 left += (item - localClusterStart - relativeLastLevelStart + 1)
                         * clusterSize;
+            } else {
+                relativeLeft = (item - localClusterStart + 1) * arity;
             }
-            while (true) {
+            while (item >= 0) {
                 while (item >= localClusterStart + relativeLastLevelStart) {
                     siftDownLast<ItemType, compOp, clusterLevels>(a,
                             item, left, count, localClusterStart);
                     item--;
                     left -= clusterSize;
                 }
-                {
-                    ssize_t relativeLeft = (item - localClusterStart + 1)
-                            * arity;
-                    while (item >= localClusterStart) {
-                        siftDownInit<ItemType, compOp, clusterLevels>(a, item,
-                                relativeLeft, end, localClusterStart);
-                        item--;
-                        relativeLeft -= arity;
-                    }
-                }
-                if (item < 0) {
-                    break;
+                while (item >= localClusterStart) {
+                    siftDownInit<ItemType, compOp, clusterLevels>(a, item,
+                            relativeLeft, end, localClusterStart);
+                    item--;
+                    relativeLeft -= arity;
                 }
                 localClusterStart -= clusterSize;
+                relativeLeft = clusterSize - arity;
             }
         }
 

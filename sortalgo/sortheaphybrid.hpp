@@ -571,9 +571,14 @@ namespace tarsa {
                         + smallClusterSecondLevelStart - 1);
                 ssize_t childClusterStart = smallClusterTotalArity
                         * (clusterStart - 1) - topClusterLastLevelStart + 1;
+                ssize_t relativeLeft = smallClusterSize
+                        - smallClusterArities[0];
                 if (item >= clusterStart + smallClusterSecondLevelStart) {
                     childClusterStart += smallClusterSize * (item - clusterStart
                             - smallClusterSecondLevelStart + 1);
+                } else {
+                    relativeLeft = smallClusterSecondLevelStart + (item
+                            - clusterStart) * smallClusterArities[0];
                 }
                 while (item >= topClusterSize) {
                     while (item >= clusterStart
@@ -583,17 +588,14 @@ namespace tarsa {
                         item--;
                         childClusterStart -= smallClusterSize;
                     }
-                    {
-                        ssize_t relativeLeft = smallClusterSecondLevelStart +
-                                (item - clusterStart) * smallClusterArities[0];
-                        while (item >= clusterStart) {
-                            siftDownFromShortLink<ItemType, compOp>(a, end,
-                                    item, clusterStart, relativeLeft);
-                            item--;
-                            relativeLeft -= smallClusterArities[0];
-                        }
+                    while (item >= clusterStart) {
+                        siftDownFromShortLink<ItemType, compOp>(a, end, item,
+                                clusterStart, relativeLeft);
+                        item--;
+                        relativeLeft -= smallClusterArities[0];
                     }
                     clusterStart -= smallClusterSize;
+                    relativeLeft = smallClusterSize - smallClusterArities[0];
                 }
             }
             for (ssize_t start = std::min(topClusterSize - 1, count - 1);
@@ -604,11 +606,9 @@ namespace tarsa {
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
-            ssize_t last = count - 1;
-            while (last > 0) {
-                std::swap(a[last], a[0]);
-                last--;
-                siftDownTip<ItemType, compOp>(a, 0, last + 1);
+            for (ssize_t next = count - 1; next > 0; next--) {
+                std::swap(a[next], a[0]);
+                siftDownTip<ItemType, compOp>(a, 0, next);
             }
         }
 

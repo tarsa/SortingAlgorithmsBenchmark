@@ -152,15 +152,15 @@ namespace tarsa {
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void heapify(ItemType * const a, ssize_t const count) {
-            for (ssize_t start = count / 4; start >= 0; start--) {
-                siftDown<ItemType, compOp>(a, start, start * 4 + 4, count - 1);
+            for (ssize_t item = count / 4; item >= 0; item--) {
+                siftDown<ItemType, compOp>(a, item, item * 4 + 4, count - 1);
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
-            for (ssize_t i = count - 1; i > 0; i--) {
-                siftDown<ItemType, compOp>(a, i, 0, i - 1);
+            for (ssize_t next = count - 1; next > 0; next--) {
+                siftDown<ItemType, compOp>(a, next, 0, next - 1);
             }
         }
 

@@ -195,33 +195,26 @@ namespace tarsa {
         template<typename ItemType, ComparisonOperator<ItemType> compOp,
         ssize_t clusterLevels>
         void heapify(ItemType * const a, ssize_t const count) {
-            ssize_t const end = count;
             ssize_t constexpr clusterSize =
                     computeClusterSize<clusterLevels>(arity);
 
-            ssize_t item = count - 1;
-            ssize_t localClusterStart = item / clusterSize * clusterSize;
-            while (true) {
+            for (ssize_t item = count - 1,
+                    localClusterStart = item / clusterSize * clusterSize;
+                    item >= 0; localClusterStart -= clusterSize) {
                 while (item >= localClusterStart) {
-                    siftDown<ItemType, compOp, clusterLevels>(a, item, end,
+                    siftDown<ItemType, compOp, clusterLevels>(a, item, count,
                             localClusterStart);
                     item--;
                 }
-                if (item < 0) {
-                    break;
-                }
-                localClusterStart -= clusterSize;
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp,
         ssize_t clusterLevels>
         void drainHeap(ItemType * const a, ssize_t const count) {
-            ssize_t last = count - 1;
-            while (last > 0) {
-                std::swap(a[last], a[0]);
-                last--;
-                siftDown<ItemType, compOp, clusterLevels>(a, 0, last + 1, 0);
+            for (ssize_t next = count - 1; next > 0; next--) {
+                std::swap(a[next], a[0]);
+                siftDown<ItemType, compOp, clusterLevels>(a, 0, next, 0);
             }
         }
 

@@ -234,40 +234,37 @@ namespace tarsa {
             ssize_t item = count - 1;
             ssize_t localClusterStart = item / clusterSize * clusterSize;
             ssize_t left = localClusterStart * clusterArity;
+            ssize_t relativeLeft = clusterSize - arity;
             if (item >= localClusterStart + relativeLastLevelStart) {
                 left += (item - localClusterStart - relativeLastLevelStart + 1)
-                        * clusterSize;
+                        * clusterSize;                
+            } else {
+                relativeLeft = (item - localClusterStart + 1) * arity;
             }
-            while (true) {
+            while (item >= 0) {
                 while (item >= localClusterStart + relativeLastLevelStart) {
                     siftDownLast<ItemType, compOp, clusterLevels>(a,
                             item, left, count, localClusterStart);
                     item--;
                     left -= clusterSize;
                 }
-                {
-                    ssize_t relativeLeft = (item - localClusterStart + 1)
-                            * arity;
-                    while (item >= localClusterStart) {
-                        siftDownInit<ItemType, compOp, clusterLevels>(a, item,
-                                relativeLeft, end, localClusterStart);
-                        item--;
-                        relativeLeft -= arity;
-                    }
-                }
-                if (item < 0) {
-                    break;
+                while (item >= localClusterStart) {
+                    siftDownInit<ItemType, compOp, clusterLevels>(a, item,
+                            relativeLeft, end, localClusterStart);
+                    item--;
+                    relativeLeft -= arity;
                 }
                 localClusterStart -= clusterSize;
+                relativeLeft = clusterSize - arity;
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp,
         ssize_t clusterLevels>
         void drainHeap(ItemType * const a, ssize_t const count) {
-            for (ssize_t i = count - 1; i > 0; i--) {
+            for (ssize_t next = count - 1; next > 0; next--) {
                 siftDownInit<ItemType, compOp, clusterLevels>
-                        (a, i, 0, i, 0);
+                        (a, next, 0, next, 0);
             }
         }
 

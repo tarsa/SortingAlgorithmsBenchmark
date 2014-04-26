@@ -139,18 +139,16 @@ namespace tarsa {
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void heapify(ItemType * const a, ssize_t const count) {
-            for (ssize_t start = count / 4; start >= 0; start--) {
-                siftDown<ItemType, compOp>(a, start, count - 1);
+            for (ssize_t item = count / 4; item >= 0; item--) {
+                siftDown<ItemType, compOp>(a, item, count - 1);
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
-            ssize_t last = count - 1;
-            while (last > 0) {
-                std::swap(a[last], a[0]);
-                last--;
-                siftDown<ItemType, compOp>(a, 0, last);
+            for (ssize_t next = count - 1; next > 0; next--) {
+                std::swap(a[next], a[0]);
+                siftDown<ItemType, compOp>(a, 0, next - 1);
             }
         }
 
