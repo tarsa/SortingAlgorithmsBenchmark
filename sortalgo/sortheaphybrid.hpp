@@ -49,8 +49,7 @@ namespace tarsa {
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void siftDownFromLongLink(ItemType * const a, ssize_t const end,
-                ssize_t root, ssize_t clusterStart, ssize_t relativeChild1,
-                ssize_t globalLevelStart, ssize_t globalLevelSize) {
+                ssize_t root, ssize_t clusterStart, ssize_t relativeChild1) {
             ssize_t const last = end - 1;
             while (true) {
                 ItemType * const cluster = a + clusterStart;
@@ -264,20 +263,16 @@ namespace tarsa {
                     }
                 }
                 root = relativeRoot + clusterStart;
-                clusterStart = (relativeRoot - smallClusterSecondLevelStart)
-                        * smallClusterSize + (clusterStart - globalLevelStart)
-                        * smallClusterTotalArity + globalLevelStart
-                        + globalLevelSize;
+                clusterStart = (relativeRoot - smallClusterSecondLevelStart + 1)
+                        * smallClusterSize + (clusterStart - 1)
+                        * smallClusterTotalArity - topClusterLastLevelStart + 1;
                 relativeChild1 = 0;
-                globalLevelStart += globalLevelSize;
-                globalLevelSize *= smallClusterTotalArity;
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void siftDownFromShortLink(ItemType * const a, ssize_t const end,
-                ssize_t root, ssize_t clusterStart, ssize_t relativeChild1,
-                ssize_t globalLevelStart, ssize_t globalLevelSize) {
+                ssize_t root, ssize_t clusterStart, ssize_t relativeChild1) {
             ssize_t const last = end - 1;
             ItemType * cluster = a + clusterStart;
             ssize_t relativeRoot = root - clusterStart;
@@ -355,13 +350,10 @@ namespace tarsa {
                     }
                 }
                 root = relativeRoot + clusterStart;
-                clusterStart = (relativeRoot - smallClusterSecondLevelStart)
-                        * smallClusterSize + (clusterStart - globalLevelStart)
-                        * smallClusterTotalArity + globalLevelStart
-                        + globalLevelSize;
+                clusterStart = (relativeRoot - smallClusterSecondLevelStart + 1)
+                        * smallClusterSize + (clusterStart - 1)
+                        * smallClusterTotalArity - topClusterLastLevelStart + 1;
                 relativeChild1 = 0;
-                globalLevelStart += globalLevelSize;
-                globalLevelSize *= smallClusterTotalArity;
 
                 cluster = a + clusterStart;
                 relativeRoot = root - clusterStart;
@@ -563,74 +555,45 @@ namespace tarsa {
             if (root >= topClusterLastLevelStart && end >= topClusterSize) {
                 siftDownFromLongLink<ItemType, compOp>(a, end, root,
                         (root - topClusterLastLevelStart) * smallClusterSize
-                        + topClusterSize, 0, topClusterSize, smallClusterSize
-                        * topClusterTotalArity);
+                        + topClusterSize, 0);
             }
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void heapify(ItemType * const a, ssize_t const count) {
             ssize_t const end = count;
-            ssize_t const item = count - 1;
-            ssize_t topRelativeItem = item - topClusterSize;
+            ssize_t item = count - 1;
 
-            if (topRelativeItem >= 0) {
-                ssize_t const smallClustersStart = topClusterSize;
-                ssize_t topRelativeGlobalLevelStart = 0;
-                ssize_t globalLevelSize = topClusterTotalArity
-                        * smallClusterSize;
-                while (topRelativeGlobalLevelStart + globalLevelSize
-                        <= topRelativeItem) {
-                    topRelativeGlobalLevelStart += globalLevelSize;
-                    globalLevelSize *= smallClusterTotalArity;
-                }
-                ssize_t topRelativeClusterStart = topRelativeItem
+            if (item >= topClusterSize) {
+                ssize_t clusterStart = topClusterSize + (item - topClusterSize)
                         / smallClusterSize * smallClusterSize;
-                topRelativeItem = std::min(topRelativeItem,
-                        topRelativeClusterStart +
-                        smallClusterSecondLevelStart - 1);
-                while (topRelativeItem >= topRelativeClusterStart) {
-                    siftDownFromLongLink<ItemType, compOp>(a, end,
-                            smallClustersStart + topRelativeItem,
-                            topRelativeClusterStart + topClusterSize,
-                            smallClusterSecondLevelStart + (topRelativeItem
-                            - topRelativeClusterStart) * smallClusterArities[0],
-                            topRelativeGlobalLevelStart + topClusterSize,
-                            globalLevelSize);
-                    topRelativeItem--;
+                item = std::min(item, clusterStart
+                        + smallClusterSecondLevelStart - 1);
+                ssize_t childClusterStart = smallClusterTotalArity
+                        * (clusterStart - 1) - topClusterLastLevelStart + 1;
+                if (item >= clusterStart + smallClusterSecondLevelStart) {
+                    childClusterStart += smallClusterSize * (item - clusterStart
+                            - smallClusterSecondLevelStart + 1);
                 }
-                while (topRelativeItem >= 0) {
-                    topRelativeClusterStart -= smallClusterSize;
-                    if (topRelativeItem < topRelativeGlobalLevelStart) {
-                        globalLevelSize /= smallClusterTotalArity;
-                        topRelativeGlobalLevelStart -= globalLevelSize;
-                    }
-                    while (topRelativeItem >= topRelativeClusterStart
+                while (item >= topClusterSize) {
+                    while (item >= clusterStart
                             + smallClusterSecondLevelStart) {
-                        siftDownFromLongLink<ItemType, compOp>(a, end,
-                                smallClustersStart + topRelativeItem,
-                                (topRelativeItem - topRelativeClusterStart -
-                                smallClusterSecondLevelStart) * smallClusterSize
-                                + (topRelativeClusterStart
-                                - topRelativeGlobalLevelStart)
-                                * smallClusterTotalArity
-                                + topRelativeGlobalLevelStart + globalLevelSize
-                                + topClusterSize, 0,
-                                topRelativeGlobalLevelStart + topClusterSize,
-                                globalLevelSize);
-                        topRelativeItem--;
+                        siftDownFromLongLink<ItemType, compOp>(a, end, item,
+                                childClusterStart, 0);
+                        item--;
+                        childClusterStart -= smallClusterSize;
                     }
-                    while (topRelativeItem >= topRelativeClusterStart) {
-                        siftDownFromShortLink<ItemType, compOp>(a, end,
-                                smallClustersStart + topRelativeItem,
-                                topRelativeClusterStart + topClusterSize,
-                                smallClusterSecondLevelStart + (topRelativeItem
-                                - topRelativeClusterStart)
-                                * smallClusterArities[0],
-                                topRelativeGlobalLevelStart + topClusterSize,
-                                globalLevelSize);
-                        topRelativeItem--;
+                    {
+                        ssize_t relativeLeft = smallClusterSecondLevelStart +
+                                (item - clusterStart) * smallClusterArities[0];
+                        while (item >= clusterStart) {
+                            siftDownFromShortLink<ItemType, compOp>(a, end,
+                                    item, clusterStart, relativeLeft);
+                            item--;
+                            relativeLeft -= smallClusterArities[0];
+                        }
                     }
+                    clusterStart -= smallClusterSize;
                 }
             }
             for (ssize_t start = std::min(topClusterSize - 1, count - 1);
