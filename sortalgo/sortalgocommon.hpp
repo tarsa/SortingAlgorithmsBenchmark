@@ -25,11 +25,16 @@
 #define	SORTALGOCOMMON_HPP
 
 namespace tarsa {
+    
+    template<int rw = 0, int locality = 3>
+    void prefetch(void const *address) {
+        __builtin_prefetch(address, rw, locality);
+    }
 
     enum ComparisonType {
         Below, Equal, Above
     };
-
+    
     template<typename ItemType>
     using ComparisonOperator = bool (*)(ItemType const, ComparisonType const,
             ItemType const);

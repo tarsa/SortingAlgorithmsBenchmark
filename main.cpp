@@ -31,6 +31,8 @@
 
 int64_t counter;
 
+#include "sortalgo/sortheapbinaryaheadsimplevarianta.hpp"
+#include "sortalgo/sortheapbinaryaheadsimplevariantb.hpp"
 #include "sortalgo/sortheapbinaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapbinaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapbinaryonebasedvarianta.hpp"
@@ -95,6 +97,18 @@ int main(int argc, char** argv) {
 
     testFunction("StdSort", original, work, size, [&]() {
         std::sort(work, work + size); });
+
+    testFunction("BinaryHeapSortAheadSimpleVariantA", original, work, size,
+            [&]() {
+                BinaryHeapSortAheadSimpleVariantA<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("BinaryHeapSortAheadSimpleVariantB", original, work, size,
+            [&]() {
+                BinaryHeapSortAheadSimpleVariantB<typ, ComparisonOperator>(
+                        work, size);
+            });
 
     testFunction("ClusteredBinaryHeapSortVariantA", original, work, size,
             [&]() {
