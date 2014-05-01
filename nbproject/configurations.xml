@@ -7,6 +7,7 @@
       <itemPath>sortalgo/sortalgocommon.hpp</itemPath>
       <itemPath>sortalgo/sortheapbinaryaheadsimplevarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapbinaryaheadsimplevariantb.hpp</itemPath>
+      <itemPath>sortalgo/sortheapbinarycascadingvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapbinaryclusteredvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapbinaryclusteredvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortheapbinaryonebasedvarianta.hpp</itemPath>
@@ -75,6 +76,11 @@
             flavor2="0">
       </item>
       <item path="sortalgo/sortheapbinaryaheadsimplevariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapbinarycascadingvarianta.hpp"
             ex="false"
             tool="3"
             flavor2="0">
@@ -170,6 +176,11 @@
             flavor2="0">
       </item>
       <item path="sortalgo/sortheapbinaryaheadsimplevariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapbinarycascadingvarianta.hpp"
             ex="false"
             tool="3"
             flavor2="0">
