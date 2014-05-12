@@ -36,6 +36,7 @@ int64_t counter;
 #include "sortalgo/sortheapbinaryaheadsimplevariantb.hpp"
 #include "sortalgo/sortheapbinarycascadingvarianta.hpp"
 #include "sortalgo/sortheapbinarycascadingvariantb.hpp"
+#include "sortalgo/sortheapbinarycascadingvariantc.hpp"
 #include "sortalgo/sortheapbinaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapbinaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapbinaryonebasedvarianta.hpp"
@@ -60,8 +61,11 @@ bool countingComparisonOperator(ItemType leftOp, ComparisonType opType,
     return genericComparisonOperator(leftOp, opType, rightOp);
 }
 
+#if 01
 #define ComparisonOperator genericComparisonOperator
-//#define ComparisonOperator countingComparisonOperator
+#else
+#define ComparisonOperator countingComparisonOperator
+#endif
 
 template<typename ItemType>
 void testFunction(std::string name, ItemType const * const original,
@@ -125,6 +129,12 @@ int main(int argc, char** argv) {
     testFunction("BinaryHeapSortCascadingVariantB",
             original, work, sorted, size, [&]() {
                 BinaryHeapSortCascadingVariantB<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("BinaryHeapSortCascadingVariantC",
+            original, work, sorted, size, [&]() {
+                BinaryHeapSortCascadingVariantC<typ, ComparisonOperator>(
                         work, size);
             });
 
