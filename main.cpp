@@ -24,6 +24,7 @@
 #define NDEBUG
 
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
@@ -64,8 +65,8 @@ bool countingComparisonOperator(ItemType leftOp, ComparisonType opType,
 
 template<typename ItemType>
 void testFunction(std::string name, ItemType const * const original,
-        ItemType * const work, ssize_t const size,
-        std::function<void() > functionInTest) {
+        ItemType * const work, ItemType const * const reference,
+        ssize_t const size, std::function<void() > functionInTest) {
     std::cout << name << std::endl;
 
     std::copy(original, original + size, work);
@@ -76,10 +77,12 @@ void testFunction(std::string name, ItemType const * const original,
     std::cout << counter << " comparisons" << std::endl;
     std::cout << clocks << " clock ticks" << std::endl;
 
-    for (ssize_t i = 0; i + 1 < size; i++) {
-        if (work[i] > work[i + 1]) {
-            std::cerr << "Error in verification!" << std::endl;
-            exit(EXIT_FAILURE);
+    if (reference != nullptr) {
+        for (ssize_t i = 0; i + 1 < size; i++) {
+            if (work[i] != reference[i]) {
+                std::cerr << "Error in verification!" << std::endl;
+                exit(EXIT_FAILURE);
+            }
         }
     }
 
@@ -91,107 +94,108 @@ int main(int argc, char** argv) {
 
     srand(7);
     typ * original = new typ[size];
+    typ * sorted = new typ[size];
     for (ssize_t i = 0; i < size; i++) {
-        original[i] = rand();
+        sorted[i] = original[i] = rand();
     }
 
     typ * work = new typ[size];
 
-    testFunction("StdSort", original, work, size, [&]() {
-        std::sort(work, work + size); });
+    testFunction("StdSort", original, work, (typ*) nullptr, size, [&]() {
+        std::sort(sorted, sorted + size); });
 
-    testFunction("BinaryHeapSortAheadSimpleVariantA", original, work, size,
-            [&]() {
+    testFunction("BinaryHeapSortAheadSimpleVariantA",
+            original, work, sorted, size, [&]() {
                 BinaryHeapSortAheadSimpleVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("BinaryHeapSortAheadSimpleVariantB", original, work, size,
-            [&]() {
+    testFunction("BinaryHeapSortAheadSimpleVariantB",
+            original, work, sorted, size, [&]() {
                 BinaryHeapSortAheadSimpleVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("BinaryHeapSortCascadingVariantA", original, work, size,
-            [&]() {
+    testFunction("BinaryHeapSortCascadingVariantA",
+            original, work, sorted, size, [&]() {
                 BinaryHeapSortCascadingVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("BinaryHeapSortCascadingVariantB", original, work, size,
-            [&]() {
+    testFunction("BinaryHeapSortCascadingVariantB",
+            original, work, sorted, size, [&]() {
                 BinaryHeapSortCascadingVariantB<typ, ComparisonOperator>(
                         work, size);
             });
-            
-    testFunction("ClusteredBinaryHeapSortVariantA", original, work, size,
-            [&]() {
+
+    testFunction("ClusteredBinaryHeapSortVariantA",
+            original, work, sorted, size, [&]() {
                 ClusteredBinaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("ClusteredBinaryHeapSortVariantB", original, work, size,
-            [&]() {
+    testFunction("ClusteredBinaryHeapSortVariantB",
+            original, work, sorted, size, [&]() {
                 ClusteredBinaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("OneBasedBinaryHeapSortVariantA", original, work, size,
-            [&]() {
+    testFunction("OneBasedBinaryHeapSortVariantA",
+            original, work, sorted, size, [&]() {
                 OneBasedBinaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("OneBasedBinaryHeapSortVariantB", original, work, size,
-            [&]() {
+    testFunction("OneBasedBinaryHeapSortVariantB",
+            original, work, sorted, size, [&]() {
                 OneBasedBinaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("HybridHeapSort", original, work, size,
-            [&]() {
+    testFunction("HybridHeapSort",
+            original, work, sorted, size, [&]() {
                 HybridHeapSort<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("QuaternaryHeapSortVariantA", original, work, size,
-            [&]() {
+    testFunction("QuaternaryHeapSortVariantA",
+            original, work, sorted, size, [&]() {
                 QuaternaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("QuaternaryHeapSortVariantB", original, work, size,
-            [&]() {
+    testFunction("QuaternaryHeapSortVariantB",
+            original, work, sorted, size, [&]() {
                 QuaternaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("ClusteredTernaryHeapSortVariantA", original, work, size,
-            [&]() {
+    testFunction("ClusteredTernaryHeapSortVariantA",
+            original, work, sorted, size, [&]() {
                 ClusteredTernaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("ClusteredTernaryHeapSortVariantB", original, work, size,
-            [&]() {
+    testFunction("ClusteredTernaryHeapSortVariantB",
+            original, work, sorted, size, [&]() {
                 ClusteredTernaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("OneBasedTernaryHeapSortVariantA", original, work, size,
-            [&]() {
+    testFunction("OneBasedTernaryHeapSortVariantA",
+            original, work, sorted, size, [&]() {
                 OneBasedTernaryHeapSortVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("OneBasedTernaryHeapSortVariantB", original, work, size,
-            [&]() {
+    testFunction("OneBasedTernaryHeapSortVariantB",
+            original, work, sorted, size, [&]() {
                 OneBasedTernaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
             });
 
-    testFunction("RandomizedQuickSort", original, work, size,
-            [&]() {
+    testFunction("RandomizedQuickSort",
+            original, work, sorted, size, [&]() {
                 RandomizedQuickSort<typ, ComparisonOperator>(
                         work, size);
             });
