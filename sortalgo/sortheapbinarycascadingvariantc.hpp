@@ -44,6 +44,13 @@ namespace tarsa {
                 computeClusterLevelSize<TopLevels - 2 > (arity);
 
         ssize_t constexpr QueueSize = 64 - TopLevels;
+        ssize_t constexpr QueueBufferFactor = 5;
+        ssize_t constexpr QueueBufferSize = QueueSize * QueueBufferFactor;
+
+        struct QueueBufferInfo {
+            ssize_t start;
+            ssize_t next;
+        };
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void siftDownStraight(ItemType * const a, ssize_t const start,
@@ -162,67 +169,84 @@ namespace tarsa {
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
-        ssize_t siftDownCascadedNoAdd(ItemType * const a, ssize_t const end,
+        void siftDownCascadedNoAdd(ItemType * const a, ssize_t const end,
                 ItemType * const itemCopiesQueue, ssize_t * const indexesQueue,
-                ssize_t * const prefixesQueue, ssize_t const queuesLength,
+                ssize_t * const prefixesQueue,
+                QueueBufferInfo * const queueBufferInfo,
                 int8_t * const prefixesCounters) {
-            ssize_t queueStoreIndex = 0;
-            for (ssize_t queueIndex = 0; queueIndex < queuesLength;
-                    queueIndex++) {
-                itemCopiesQueue[queueStoreIndex] = itemCopiesQueue[queueIndex];
-                indexesQueue[queueStoreIndex] = indexesQueue[queueIndex];
+            for (ssize_t queueIndex = queueBufferInfo->start;
+                    queueIndex < queueBufferInfo->next; queueIndex++) {
                 ssize_t const prefix = prefixesQueue[queueIndex];
-                prefixesQueue[queueStoreIndex] = prefix;
+                bool reachedBottom;
                 if (prefixesCounters[prefix - CountedLevelStart - 1] > 1) {
-                    bool const reachedBottom = siftDownSingleStepImmediate<
-                            ItemType, compOp>(a, end, indexesQueue
-                            + queueStoreIndex);
-                    queueStoreIndex += !reachedBottom;
-                    prefixesCounters[prefix - CountedLevelStart - 1] -=
-                            reachedBottom;
+                    reachedBottom = siftDownSingleStepImmediate<ItemType,
+                            compOp>(a, end, indexesQueue + queueIndex);
                 } else {
                     assert(prefixesCounters[prefix - CountedLevelStart - 1]
                             == 1);
-                    bool reachedBottom = siftDownSingleStepBacktracking<
-                            ItemType, compOp>(a, end, indexesQueue
-                            + queueStoreIndex);
+                    reachedBottom = siftDownSingleStepBacktracking<ItemType,
+                            compOp>(a, end, indexesQueue + queueIndex);
                     if (reachedBottom) {
-                        assert(indexesQueue[queueStoreIndex] <= end);
+                        assert(indexesQueue[queueIndex] <= end);
                         siftDownBacktrack<ItemType, compOp>(a,
-                                indexesQueue[queueStoreIndex],
-                                itemCopiesQueue[queueStoreIndex]);
+                                indexesQueue[queueIndex],
+                                itemCopiesQueue[queueIndex]);
                     }
-                    queueStoreIndex += !reachedBottom;
-                    prefixesCounters[prefix - CountedLevelStart - 1] -=
-                            reachedBottom;
+                }
+                prefixesCounters[prefix - CountedLevelStart - 1] -=
+                        reachedBottom;
+                if (reachedBottom) {
+                    for (ssize_t toIndex = queueIndex; toIndex - 1
+                            >= queueBufferInfo->start; toIndex--) {
+                        itemCopiesQueue[toIndex] = itemCopiesQueue[toIndex - 1];
+                        indexesQueue[toIndex] = indexesQueue[toIndex - 1];
+                        prefixesQueue[toIndex] = prefixesQueue[toIndex - 1];
+                    }
+                    queueBufferInfo->start++;
                 }
             }
-            return queueStoreIndex;
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
-        ssize_t siftDownCascaded(ItemType * const a, ssize_t const end,
+        void siftDownCascaded(ItemType * const a, ssize_t const end,
                 ItemType * const itemCopiesQueue, ssize_t * const indexesQueue,
-                ssize_t * const prefixesQueue, ssize_t queuesLength,
+                ssize_t * const prefixesQueue,
+                QueueBufferInfo * const queueBufferInfo,
                 int8_t * const prefixesCounters) {
             ssize_t const itemIndex = siftDownTop<ItemType, compOp>(a,
                     prefixesCounters);
             if (itemIndex - 1 >= CountedLevelStart) {
                 assert(itemIndex - 1 < TopSize);
-                itemCopiesQueue[queuesLength] = a[itemIndex];
-                indexesQueue[queuesLength] = itemIndex;
+                if (queueBufferInfo->next == QueueBufferSize) {
+                    ssize_t const distance = queueBufferInfo->start;
+                    for (ssize_t toIndex = 0; toIndex + distance
+                            < QueueBufferSize; toIndex++) {
+                        itemCopiesQueue[toIndex] =
+                                itemCopiesQueue[toIndex + distance];
+                        indexesQueue[toIndex] =
+                                indexesQueue[toIndex + distance];
+                        prefixesQueue[toIndex] =
+                                prefixesQueue[toIndex + distance];
+                    }
+                    queueBufferInfo->start = 0;
+                    queueBufferInfo->next -= distance;
+                }
+                ssize_t const newItemIndex = queueBufferInfo->next;
+                itemCopiesQueue[newItemIndex] = a[itemIndex];
+                indexesQueue[newItemIndex] = itemIndex;
                 if (itemIndex - 1 >= TopLastLevelStart) {
                     ssize_t const itemPrefix = itemIndex >> 1;
-                    prefixesQueue[queuesLength] = itemPrefix;
+                    prefixesQueue[newItemIndex] = itemPrefix;
                     prefixesCounters[itemPrefix - CountedLevelStart - 1]++;
                 } else {
                     ssize_t const itemPrefix = itemIndex;
-                    prefixesQueue[queuesLength] = itemPrefix;
+                    prefixesQueue[newItemIndex] = itemPrefix;
                     prefixesCounters[itemPrefix - CountedLevelStart - 1]++;
                     if (prefixesCounters[itemPrefix - CountedLevelStart - 1]
                             == 2) {
                         ssize_t collidingItemIndex = -1;
-                        for (ssize_t i = 0; i < queuesLength; i++) {
+                        for (ssize_t i = queueBufferInfo->start;
+                                i < queueBufferInfo->next; i++) {
                             if (prefixesQueue[i] == itemPrefix) {
                                 assert(collidingItemIndex == -1);
                                 collidingItemIndex = i;
@@ -233,56 +257,54 @@ namespace tarsa {
                                 indexesQueue[collidingItemIndex],
                                 itemCopiesQueue[collidingItemIndex]);
                         siftDownSingleStepImmediate<ItemType, compOp>(a, end,
-                                indexesQueue + queuesLength);
+                                indexesQueue + newItemIndex);
                     }
                 }
-                assert(prefixesQueue[queuesLength] - CountedLevelStart >= 1);
-                assert(prefixesQueue[queuesLength] - CountedLevelStart - 1
+                assert(prefixesQueue[newItemIndex] - CountedLevelStart >= 1);
+                assert(prefixesQueue[newItemIndex] - CountedLevelStart - 1
                         < CountedPrefixesNumber);
-                queuesLength++;
-                assert(queuesLength <= QueueSize);
+                queueBufferInfo->next++;
+                assert(queueBufferInfo->next <= QueueBufferSize);
             }
-            return siftDownCascadedNoAdd<ItemType, compOp>(a, end,
-                    itemCopiesQueue, indexesQueue, prefixesQueue, queuesLength,
-                    prefixesCounters);
+            siftDownCascadedNoAdd<ItemType, compOp>(a, end,
+                    itemCopiesQueue, indexesQueue, prefixesQueue,
+                    queueBufferInfo, prefixesCounters);
         }
 
         template<typename ItemType, ComparisonOperator<ItemType> compOp>
         void drainHeap(ItemType * const a, ssize_t const count) {
             ssize_t next = count;
             if (next > TopSize) {
-                ItemType itemCopiesQueue[QueueSize];
-                ssize_t indexesQueue[QueueSize];
-                ssize_t prefixesQueue[QueueSize];
-                ssize_t queuesLength = 0;
+                ItemType itemCopiesQueue[QueueBufferSize];
+                ssize_t indexesQueue[QueueBufferSize];
+                ssize_t prefixesQueue[QueueBufferSize];
+                QueueBufferInfo queueBufferInfo;
+                queueBufferInfo.start = 0;
+                queueBufferInfo.next = 0;
                 int8_t prefixesCounters[CountedPrefixesNumber];
                 for (ssize_t i = 0; i < CountedPrefixesNumber; i++) {
                     prefixesCounters[i] = 0;
                 }
                 for (; next > TopSize; next--) {
-                    if (queuesLength > 0 && indexesQueue[0] == next
-                            && prefixesCounters[prefixesQueue[0]
-                            - CountedLevelStart - 1] == 1) {
+                    if (queueBufferInfo.next > queueBufferInfo.start
+                            && indexesQueue[queueBufferInfo.start] == next
+                            && prefixesCounters[prefixesQueue[queueBufferInfo
+                            .start] - CountedLevelStart - 1] == 1) {
                         siftDownBacktrack<ItemType, compOp>(a, next,
-                                itemCopiesQueue[0]);
-                        prefixesCounters[prefixesQueue[0]
+                                itemCopiesQueue[queueBufferInfo.start]);
+                        prefixesCounters[prefixesQueue[queueBufferInfo.start]
                                 - CountedLevelStart - 1]--;
-                        for (ssize_t i = 1; i < queuesLength; i++) {
-                            itemCopiesQueue[i - 1] = itemCopiesQueue[i];
-                            indexesQueue[i - 1] = indexesQueue[i];
-                            prefixesQueue[i - 1] = prefixesQueue[i];
-                        }
-                        queuesLength--;
+                        queueBufferInfo.start++;
                     }
                     std::swap(a[next], a[1]);
-                    queuesLength = siftDownCascaded<ItemType, compOp>(a,
-                            next - 1, itemCopiesQueue, indexesQueue,
-                            prefixesQueue, queuesLength, prefixesCounters);
+                    siftDownCascaded<ItemType, compOp>(a, next - 1,
+                            itemCopiesQueue, indexesQueue, prefixesQueue,
+                            &queueBufferInfo, prefixesCounters);
                 }
-                for (ssize_t i = 0; i < queuesLength; i++) {
-                    queuesLength = siftDownCascadedNoAdd<ItemType, compOp>(a,
-                            next - 1, itemCopiesQueue, indexesQueue,
-                            prefixesQueue, queuesLength, prefixesCounters);
+                while (queueBufferInfo.start < queueBufferInfo.next) {
+                    siftDownCascadedNoAdd<ItemType, compOp>(a, next - 1,
+                            itemCopiesQueue, indexesQueue, prefixesQueue,
+                            &queueBufferInfo, prefixesCounters);
                 }
             }
             for (; next > 1; next--) {
