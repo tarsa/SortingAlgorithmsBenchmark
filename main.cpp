@@ -37,6 +37,7 @@ int64_t counter;
 #include "sortalgo/sortheapbinarycascadingvarianta.hpp"
 #include "sortalgo/sortheapbinarycascadingvariantb.hpp"
 #include "sortalgo/sortheapbinarycascadingvariantc.hpp"
+#include "sortalgo/sortheapbinarycascadingvariantd.hpp"
 #include "sortalgo/sortheapbinaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapbinaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapbinaryonebasedvarianta.hpp"
@@ -135,6 +136,12 @@ int main(int argc, char** argv) {
     testFunction("BinaryHeapSortCascadingVariantC",
             original, work, sorted, size, [&]() {
                 BinaryHeapSortCascadingVariantC<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("BinaryHeapSortCascadingVariantD",
+            original, work, sorted, size, [&]() {
+                BinaryHeapSortCascadingVariantD<typ, ComparisonOperator>(
                         work, size);
             });
 
