@@ -5,4 +5,4 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
-
+.dep.inc
