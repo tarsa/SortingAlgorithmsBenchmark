@@ -45,6 +45,7 @@ int64_t counter;
 #include "sortalgo/sortheaphybrid.hpp"
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
+#include "sortalgo/sortheapternarycascadingvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvariantb.hpp"
 #include "sortalgo/sortheapternaryonebasedvarianta.hpp"
@@ -184,6 +185,12 @@ int main(int argc, char** argv) {
     testFunction("QuaternaryHeapSortVariantB",
             original, work, sorted, size, [&]() {
                 QuaternaryHeapSortVariantB<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("TernaryHeapSortCascadingVariantA",
+            original, work, sorted, size, [&]() {
+                TernaryHeapSortCascadingVariantA<typ, ComparisonOperator>(
                         work, size);
             });
 

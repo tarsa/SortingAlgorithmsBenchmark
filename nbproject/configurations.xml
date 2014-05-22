@@ -18,6 +18,7 @@
       <itemPath>sortalgo/sortheaphybrid.hpp</itemPath>
       <itemPath>sortalgo/sortheapquaternaryvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapquaternaryvariantb.hpp</itemPath>
+      <itemPath>sortalgo/sortheapternarycascadingvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryclusteredvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryclusteredvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryonebasedvarianta.hpp</itemPath>
@@ -135,6 +136,11 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="sortalgo/sortheapternarycascadingvarianta.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="sortalgo/sortheapternaryclusteredvarianta.hpp"
             ex="false"
             tool="3"
@@ -246,6 +252,11 @@
             flavor2="0">
       </item>
       <item path="sortalgo/sortheapquaternaryvariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapternarycascadingvarianta.hpp"
             ex="false"
             tool="3"
             flavor2="0">
