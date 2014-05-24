@@ -39,17 +39,17 @@ OBJECTFILES= \
 
 
 # C Compiler Flags
-CFLAGS=
+CFLAGS=-mavx2
 
 # CC Compiler Flags
-CCFLAGS=
-CXXFLAGS=
+CCFLAGS=-mavx2
+CXXFLAGS=-mavx2
 
 # Fortran Compiler Flags
-FFLAGS=
+FFLAGS=-mavx2
 
 # Assembler Flags
-ASFLAGS=
+ASFLAGS=-mavx2
 
 # Link Libraries and Options
 LDLIBSOPTIONS=

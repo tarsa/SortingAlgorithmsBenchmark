@@ -46,6 +46,8 @@ int64_t counter;
 #include "sortalgo/sortheapquaternarycascadingvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
+#include "sortalgo/sortheapsimddwordcascadingvariantb.hpp"
+#include "sortalgo/sortheapsimddwordvariantb.hpp"
 #include "sortalgo/sortheapternarycascadingvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvariantb.hpp"
@@ -100,14 +102,16 @@ int main(int argc, char** argv) {
     ssize_t size = 12345678;
 
     srand(7);
-    typ * original = new typ[size];
-    typ * sorted = new typ[size];
+    typ * original;
+    typ * sorted;
+    typ * work;
+    posix_memalign((void**)&original, 128, sizeof(typ) * size);
+    posix_memalign((void**)&sorted, 128, sizeof(typ) * size);
+    posix_memalign((void**)&work, 128, sizeof(typ) * size);
+    
     for (ssize_t i = 0; i < size; i++) {
         sorted[i] = original[i] = rand();
     }
-
-    typ * work = new typ[size];
-
     testFunction("StdSort", original, work, (typ*) nullptr, size, [&]() {
         std::sort(sorted, sorted + size); });
 
@@ -193,6 +197,16 @@ int main(int argc, char** argv) {
             original, work, sorted, size, [&]() {
                 QuaternaryHeapSortVariantB<typ, ComparisonOperator>(
                         work, size);
+            });
+
+    testFunction("SimdDwordCascadingHeapSortVariantB",
+            original, work, sorted, size, [&]() {
+                SimdDwordCascadingHeapSortVariantB<typ>(work, size);
+            });
+
+    testFunction("SimdDwordHeapSortVariantB",
+            original, work, sorted, size, [&]() {
+                SimdDwordHeapSortVariantB<typ>(work, size);
             });
 
     testFunction("TernaryHeapSortCascadingVariantA",

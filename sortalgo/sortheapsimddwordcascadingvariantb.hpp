@@ -1,0 +1,203 @@
+/* 
+ * sortheapsimddwordcascadingvariantb.hpp -- sorting algorithms benchmark
+ * 
+ * Copyright (C) 2014 Piotr Tarsa ( http://github.com/tarsa )
+ *
+ *  This software is provided 'as-is', without any express or implied
+ *  warranty.  In no event will the author be held liable for any damages
+ *  arising from the use of this software.
+ *
+ *  Permission is granted to anyone to use this software for any purpose,
+ *  including commercial applications, and to alter it and redistribute it
+ *  freely, subject to the following restrictions:
+ *
+ *  1. The origin of this software must not be misrepresented; you must not
+ *     claim that you wrote the original software. If you use this software
+ *     in a product, an acknowledgment in the product documentation would be
+ *     appreciated but is not required.
+ *  2. Altered source versions must be plainly marked as such, and must not be
+ *     misrepresented as being the original software.
+ *  3. This notice may not be removed or altered from any source distribution.
+ * 
+ */
+
+#ifndef SORTHEAPSIMDDWORDCASCADINGVARIANTB_HPP
+#define	SORTHEAPSIMDDWORDCASCADINGVARIANTB_HPP
+
+#include "sortalgocommon.hpp"
+
+#include <x86intrin.h>
+
+namespace tarsa {
+
+    namespace privateSimdDwordCascadingHeapSortVariantB {
+
+        ssize_t constexpr Arity = 8;
+
+        ssize_t constexpr QueueSize = 64;
+
+        template<typename ItemType, bool Ascending>
+        bool ordered(ItemType const &a, ItemType const &b) {
+        }
+
+        template<>
+        bool ordered<int32_t, true>(int32_t const &a, int32_t const &b) {
+            return a < b;
+        }
+
+        template<>
+        bool ordered<uint32_t, true>(uint32_t const &a, uint32_t const &b) {
+            return a < b;
+        }
+
+        template<>
+        bool ordered<int32_t, false>(int32_t const &a, int32_t const &b) {
+            return a > b;
+        }
+
+        template<>
+        bool ordered<uint32_t, false>(uint32_t const &a, uint32_t const &b) {
+            return a > b;
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        void siftUp(ItemType * const a, ssize_t const start) {
+            ssize_t current = start;
+            while (current >= Arity) {
+                ssize_t const parent = current / Arity - 1;
+                if (ordered<ItemType, Ascending>(a[parent], a[current])) {
+                    std::swap(a[parent], a[current]);
+                    current = parent;
+                } else {
+                    return;
+                }
+            }
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        void heapify(ItemType * const a, ssize_t const count) {
+            for (ssize_t item = Arity; item < count; item++) {
+                siftUp<ItemType, Signed, Ascending, Payload>(a, item);
+            }
+        }
+
+        template<bool Signed, bool Ascending>
+        __v8si horizontalLeaderSelect(__v8si const a, __v8si const b) {
+        }
+
+        template<>
+        __v8si horizontalLeaderSelect<true, true>(
+                const __v8si a, const __v8si b) {
+            return _mm256_max_epi32(a, b);
+        }
+
+        template<>
+        __v8si horizontalLeaderSelect<false, true>(
+                const __v8si a, const __v8si b) {
+            return _mm256_max_epu32(a, b);
+        }
+
+        template<>
+        __v8si horizontalLeaderSelect<true, false>(
+                const __v8si a, const __v8si b) {
+            return _mm256_min_epi32(a, b);
+        }
+
+        template<>
+        __v8si horizontalLeaderSelect<false, false>(
+                const __v8si a, const __v8si b) {
+            return _mm256_min_epu32(a, b);
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending>
+        ssize_t leaderIndex(ItemType const * const a) {
+            __v8si v1 = _mm256_load_si256((__m256i *) a);
+            __v8si v2 = v1;
+            v2 = horizontalLeaderSelect<Signed, Ascending>(v2, 
+                    _mm256_alignr_epi8(v2, v2, 4));
+            v2 = horizontalLeaderSelect<Signed, Ascending>(v2, 
+                    _mm256_alignr_epi8(v2, v2, 8));
+            v2 = horizontalLeaderSelect<Signed, Ascending>(v2,
+                    _mm256_permute2x128_si256(v2, v2, 0x01));
+            __v8si vcmp = _mm256_cmpeq_epi32(v1, v2);
+            uint32_t mask = _mm256_movemask_epi8(vcmp);
+            return __builtin_ctz(mask) / 4;
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        bool siftDownSingleStep(ItemType * const a, ssize_t const count,
+                ssize_t * const queueSlot, ssize_t const child1) {
+            ssize_t const root = *queueSlot;
+
+            if (child1 + Arity - 1 < count) {
+                ssize_t const leader = child1 + leaderIndex<ItemType, Signed,
+                        Ascending>(a + child1);
+                if (ordered<ItemType, Ascending>(a[root], a[leader])) {
+                    std::swap(a[root], a[leader]);
+                    *queueSlot = leader;
+                    prefetch(a + std::min((leader + 1) * Arity,
+                            count - 1));
+                    return true;
+                }
+            } else {
+                ssize_t leader = root;
+                ssize_t lastChild = std::min(child1 + Arity - 1, count - 1);
+                for (ssize_t child = child1; child <= lastChild; child++) {
+                    if (ordered<ItemType, Ascending>(a[leader], a[child])) {
+                        leader = child;
+                    }
+                }
+                std::swap(a[root], a[leader]);
+            }
+            return false;
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        ssize_t siftDownCascaded(ItemType * const a, ssize_t * const queue,
+                ssize_t queueLength, ssize_t const count) {
+            ssize_t queueStoreIndex = 0;
+            for (ssize_t queueIndex = (queue[0] + 1) * Arity >= count;
+                    queueIndex < queueLength; queueIndex++) {
+                ssize_t const item = queue[queueIndex];
+                queue[queueStoreIndex] = item;
+                queueStoreIndex += siftDownSingleStep<ItemType, Signed,
+                        Ascending, Payload>(a, count, queue + queueStoreIndex,
+                        (item + 1) * Arity);
+            }
+            queue[queueStoreIndex] = count - 1;
+            queueStoreIndex += siftDownSingleStep<ItemType, Signed, Ascending,
+                    Payload>(a, count, queue + queueStoreIndex, 0);
+            return queueStoreIndex;
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        void drainHeap(ItemType * const a, ssize_t const count) {
+            ssize_t queue[QueueSize];
+            ssize_t queueLength = 0;
+            for (ssize_t next = count; next > 0; next--) {
+                queueLength = siftDownCascaded<ItemType, Signed, Ascending,
+                        Payload>(a, queue, queueLength, next);
+            }
+        }
+
+        template<typename ItemType, bool Signed, bool Ascending, bool Payload>
+        void heapsort(ItemType * const a, ssize_t const count) {
+            heapify<ItemType, Signed, Ascending, Payload>(a, count);
+            drainHeap<ItemType, Signed, Ascending, Payload>(a, count);
+        }
+    }
+
+    template<typename ItemType, bool Ascending = true, bool Payload = false >
+    void SimdDwordCascadingHeapSortVariantB(ItemType * const a, 
+            ssize_t const count) {
+        static_assert(Payload == false, "payload not implemented");
+        bool constexpr ok = std::is_same<ItemType, int32_t>::value
+                || std::is_same<ItemType, uint32_t>::value;
+        static_assert(ok, "parameters invalid or specialization missing");
+        privateSimdDwordCascadingHeapSortVariantB::heapsort<ItemType,
+                std::is_same<ItemType, int32_t>::value, Ascending, Payload>(
+                a, count);
+    }
+}
+
+#endif	/* SORTHEAPSIMDDWORDCASCADINGVARIANTB_HPP */
