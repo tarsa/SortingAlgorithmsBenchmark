@@ -20,7 +20,9 @@
       <itemPath>sortalgo/sortheapquaternaryvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapquaternaryvariantb.hpp</itemPath>
       <itemPath>sortalgo/sortheapsimddwordcascadingvariantb.hpp</itemPath>
+      <itemPath>sortalgo/sortheapsimddwordcascadingvariantc.hpp</itemPath>
       <itemPath>sortalgo/sortheapsimddwordvariantb.hpp</itemPath>
+      <itemPath>sortalgo/sortheapsimddwordvariantc.hpp</itemPath>
       <itemPath>sortalgo/sortheapternarycascadingvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryclusteredvarianta.hpp</itemPath>
       <itemPath>sortalgo/sortheapternaryclusteredvariantb.hpp</itemPath>
@@ -153,7 +155,17 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="sortalgo/sortheapsimddwordcascadingvariantc.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="sortalgo/sortheapsimddwordvariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapsimddwordvariantc.hpp"
             ex="false"
             tool="3"
             flavor2="0">
@@ -292,7 +304,17 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="sortalgo/sortheapsimddwordcascadingvariantc.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="sortalgo/sortheapsimddwordvariantb.hpp"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="sortalgo/sortheapsimddwordvariantc.hpp"
             ex="false"
             tool="3"
             flavor2="0">

@@ -47,7 +47,9 @@ int64_t counter;
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
 #include "sortalgo/sortheapsimddwordcascadingvariantb.hpp"
+#include "sortalgo/sortheapsimddwordcascadingvariantc.hpp"
 #include "sortalgo/sortheapsimddwordvariantb.hpp"
+#include "sortalgo/sortheapsimddwordvariantc.hpp"
 #include "sortalgo/sortheapternarycascadingvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvarianta.hpp"
 #include "sortalgo/sortheapternaryclusteredvariantb.hpp"
@@ -105,10 +107,10 @@ int main(int argc, char** argv) {
     typ * original;
     typ * sorted;
     typ * work;
-    posix_memalign((void**)&original, 128, sizeof(typ) * size);
-    posix_memalign((void**)&sorted, 128, sizeof(typ) * size);
-    posix_memalign((void**)&work, 128, sizeof(typ) * size);
-    
+    posix_memalign((void**) &original, 128, sizeof (typ) * size);
+    posix_memalign((void**) &sorted, 128, sizeof (typ) * size);
+    posix_memalign((void**) &work, 128, sizeof (typ) * size);
+
     for (ssize_t i = 0; i < size; i++) {
         sorted[i] = original[i] = rand();
     }
@@ -204,9 +206,19 @@ int main(int argc, char** argv) {
                 SimdDwordCascadingHeapSortVariantB<typ>(work, size);
             });
 
+    testFunction("SimdDwordCascadingHeapSortVariantC",
+            original, work, sorted, size, [&]() {
+                SimdDwordCascadingHeapSortVariantC<typ>(work, size);
+            });
+
     testFunction("SimdDwordHeapSortVariantB",
             original, work, sorted, size, [&]() {
                 SimdDwordHeapSortVariantB<typ>(work, size);
+            });
+
+    testFunction("SimdDwordHeapSortVariantC",
+            original, work, sorted, size, [&]() {
+                SimdDwordHeapSortVariantC<typ>(work, size);
             });
 
     testFunction("TernaryHeapSortCascadingVariantA",
