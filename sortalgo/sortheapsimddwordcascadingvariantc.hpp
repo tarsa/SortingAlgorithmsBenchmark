@@ -82,29 +82,29 @@ namespace tarsa {
         }
 
         template<bool Signed, bool Ascending>
-        __v4si horizontalLeaderSelect(__v4si const a, __v4si const b) {
+        __v4si verticalLeaderSelect(__v4si const a, __v4si const b) {
         }
 
         template<>
-        __v4si horizontalLeaderSelect<true, true>(
+        __v4si verticalLeaderSelect<true, true>(
                 const __v4si a, const __v4si b) {
             return _mm_max_epi32(a, b);
         }
 
         template<>
-        __v4si horizontalLeaderSelect<false, true>(
+        __v4si verticalLeaderSelect<false, true>(
                 const __v4si a, const __v4si b) {
             return _mm_max_epu32(a, b);
         }
 
         template<>
-        __v4si horizontalLeaderSelect<true, false>(
+        __v4si verticalLeaderSelect<true, false>(
                 const __v4si a, const __v4si b) {
             return _mm_min_epi32(a, b);
         }
 
         template<>
-        __v4si horizontalLeaderSelect<false, false>(
+        __v4si verticalLeaderSelect<false, false>(
                 const __v4si a, const __v4si b) {
             return _mm_min_epu32(a, b);
         }
@@ -117,10 +117,10 @@ namespace tarsa {
             __v8si vec = _mm256_load_si256((__m256i *) a);
             __v4si lo = _mm256_castsi256_si128(vec);
             __v4si hi = _mm256_extractf128_si256(vec, 1);
-            __v4si tmp = horizontalLeaderSelect<Signed, Ascending>(lo, hi);
-            tmp = horizontalLeaderSelect<Signed, Ascending>(tmp,
+            __v4si tmp = verticalLeaderSelect<Signed, Ascending>(lo, hi);
+            tmp = verticalLeaderSelect<Signed, Ascending>(tmp,
                     _mm_shuffle_epi32(tmp, _MM_SHUFFLE(1, 0, 3, 2)));
-            tmp = horizontalLeaderSelect<Signed, Ascending>(tmp,
+            tmp = verticalLeaderSelect<Signed, Ascending>(tmp,
                     // using lo_epi16 for speed here
                     _mm_shufflelo_epi16(tmp, _MM_SHUFFLE(1, 0, 3, 2))); 
             ItemType const leader = _mm_cvtsi128_si32(tmp);

@@ -82,29 +82,29 @@ namespace tarsa {
         }
 
         template<bool Signed, bool Ascending>
-        __v8si horizontalLeaderSelect(__v8si const a, __v8si const b) {
+        __v8si verticalLeaderSelect(__v8si const a, __v8si const b) {
         }
 
         template<>
-        __v8si horizontalLeaderSelect<true, true>(
+        __v8si verticalLeaderSelect<true, true>(
                 const __v8si a, const __v8si b) {
             return _mm256_max_epi32(a, b);
         }
 
         template<>
-        __v8si horizontalLeaderSelect<false, true>(
+        __v8si verticalLeaderSelect<false, true>(
                 const __v8si a, const __v8si b) {
             return _mm256_max_epu32(a, b);
         }
 
         template<>
-        __v8si horizontalLeaderSelect<true, false>(
+        __v8si verticalLeaderSelect<true, false>(
                 const __v8si a, const __v8si b) {
             return _mm256_min_epi32(a, b);
         }
 
         template<>
-        __v8si horizontalLeaderSelect<false, false>(
+        __v8si verticalLeaderSelect<false, false>(
                 const __v8si a, const __v8si b) {
             return _mm256_min_epu32(a, b);
         }
@@ -116,11 +116,11 @@ namespace tarsa {
         ssize_t leaderIndex(ItemType const * const a) {
             __v8si v1 = _mm256_load_si256((__m256i *) a);
             __v8si v2 = v1;
-            v2 = horizontalLeaderSelect<Signed, Ascending>(v2, 
+            v2 = verticalLeaderSelect<Signed, Ascending>(v2, 
                     _mm256_alignr_epi8(v2, v2, 4));
-            v2 = horizontalLeaderSelect<Signed, Ascending>(v2, 
+            v2 = verticalLeaderSelect<Signed, Ascending>(v2, 
                     _mm256_alignr_epi8(v2, v2, 8));
-            v2 = horizontalLeaderSelect<Signed, Ascending>(v2,
+            v2 = verticalLeaderSelect<Signed, Ascending>(v2,
                     _mm256_permute2x128_si256(v2, v2, 0x01));
             __v8si vcmp = _mm256_cmpeq_epi32(v1, v2);
             uint32_t mask = _mm256_movemask_epi8(vcmp);
