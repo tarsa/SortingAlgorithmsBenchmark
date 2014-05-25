@@ -107,6 +107,9 @@ namespace tarsa {
             return _mm256_min_epu32(a, b);
         }
 
+        /*
+         * based on: http://stackoverflow.com/a/23592221/492749
+         */
         template<typename ItemType, bool Signed, bool Ascending>
         ssize_t leaderIndex(ItemType const * const a) {
             __v8si v1 = _mm256_load_si256((__m256i *) a);
