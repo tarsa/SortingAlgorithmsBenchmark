@@ -43,6 +43,7 @@ int64_t counter;
 #include "sortalgo/sortheapbinaryonebasedvarianta.hpp"
 #include "sortalgo/sortheapbinaryonebasedvariantb.hpp"
 #include "sortalgo/sortheaphybrid.hpp"
+#include "sortalgo/sortheaphybridcascading.hpp"
 #include "sortalgo/sortheapquaternarycascadingvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvarianta.hpp"
 #include "sortalgo/sortheapquaternaryvariantb.hpp"
@@ -180,6 +181,12 @@ int main(int argc, char** argv) {
     testFunction("HybridHeapSort",
             original, work, sorted, size, [&]() {
                 HybridHeapSort<typ, ComparisonOperator>(
+                        work, size);
+            });
+
+    testFunction("HybridCascadingHeapSort",
+            original, work, sorted, size, [&]() {
+                HybridCascadingHeapSort<typ, ComparisonOperator>(
                         work, size);
             });
 

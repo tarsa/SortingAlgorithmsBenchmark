@@ -25,7 +25,7 @@
 #define	SORTALGOCOMMON_HPP
 
 namespace tarsa {
-    
+
     template<int rw = 0, int locality = 3>
     void prefetch(void const *address) {
         __builtin_prefetch(address, rw, locality);
@@ -34,7 +34,7 @@ namespace tarsa {
     enum ComparisonType {
         Below, Equal, Above
     };
-    
+
     template<typename ItemType>
     using ComparisonOperator = bool (*)(ItemType const, ComparisonType const,
             ItemType const);
@@ -48,29 +48,35 @@ namespace tarsa {
             case Above: return leftOp > rightOp;
         }
     }
-    
+
     template<typename ItemType>
     bool genericReverseComparisonOperator(ItemType const leftOp,
             ComparisonType const opType, ItemType const rightOp) {
         return genericComparisonOperator(rightOp, opType, leftOp);
     }
-    
+
     namespace privateClusteredHeapsorts {
+
+        ssize_t constexpr integerPower(ssize_t const base,
+                ssize_t const exponent) {
+            return exponent == 0 ? 1 : base * integerPower(base, exponent - 1);
+        }
+
         template<ssize_t levels>
         ssize_t constexpr computeClusterSize(ssize_t const arity) {
             return 1 + arity * computeClusterSize<levels - 1>(arity);
         }
-        
+
         template<>
         ssize_t constexpr computeClusterSize<0>(ssize_t const arity) {
             return 0;
         }
-        
+
         template<ssize_t level>
         ssize_t constexpr computeClusterLevelSize(ssize_t const arity) {
             return arity * computeClusterLevelSize<level - 1>(arity);
         }
-        
+
         template<>
         ssize_t constexpr computeClusterLevelSize<0>(ssize_t const arity) {
             return 1;
