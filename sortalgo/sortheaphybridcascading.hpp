@@ -188,26 +188,19 @@ namespace tarsa {
             ssize_t const clusterStart = *clusterSlot;
             ssize_t child1 = clusterStart;
             if (count - child1 >= 4) {
-                ssize_t leader = parent;
                 ssize_t const child2 = child1 + 1;
                 ssize_t const child3 = child2 + 1;
                 ssize_t const child4 = child3 + 1;
-
-                if (compOp(a[leader], Below, a[child1])) {
-                    leader = child1;
-                }
-                if (compOp(a[leader], Below, a[child2])) {
-                    leader = child2;
-                }
-                if (compOp(a[leader], Below, a[child3])) {
-                    leader = child3;
-                }
-                if (compOp(a[leader], Below, a[child4])) {
-                    leader = child4;
-                }
-                if (leader != parent) {
-                    std::swap(a[leader], a[parent]);
-                    parent = leader;
+                ssize_t const leader12 = child1
+                        + compOp(a[child1], Below, a[child2]);
+                ssize_t const leader34 = child3
+                        + compOp(a[child3], Below, a[child4]);
+                ssize_t const leader1234 =
+                        compOp(a[leader12], Below, a[leader34])
+                        ? leader34 : leader12;
+                if (compOp(a[parent], Below, a[leader1234])) {
+                    std::swap(a[parent], a[leader1234]);
+                    parent = leader1234;
                 } else {
                     return true;
                 }
@@ -227,14 +220,13 @@ namespace tarsa {
                 ssize_t leader = parent;
                 ssize_t const child2 = child1 + 1;
                 ssize_t const child3 = child2 + 1;
-                if (compOp(a[leader], Below, a[child1])) {
-                    leader = child1;
-                }
-                if (compOp(a[leader], Below, a[child2])) {
-                    leader = child2;
-                }
+                ssize_t const leader12 = child1
+                        + compOp(a[child1], Below, a[child2]);
                 if (compOp(a[leader], Below, a[child3])) {
                     leader = child3;
+                }
+                if (compOp(a[leader], Below, a[leader12])) {
+                    leader = leader12;
                 }
                 if (leader != parent) {
                     std::swap(a[leader], a[parent]);
@@ -266,19 +258,17 @@ namespace tarsa {
             ssize_t parent = 0;
             while (parent < TopClusterLastLevelStart) {
                 ssize_t const child1 = parent * 3 + 1;
-
                 if (count - child1 >= 3) {
                     ssize_t leader = parent;
                     ssize_t const child2 = child1 + 1;
                     ssize_t const child3 = child2 + 1;
-                    if (compOp(a[leader], Below, a[child1])) {
-                        leader = child1;
-                    }
-                    if (compOp(a[leader], Below, a[child2])) {
-                        leader = child2;
-                    }
+                    ssize_t const leader12 = child1
+                            + compOp(a[child1], Below, a[child2]);
                     if (compOp(a[leader], Below, a[child3])) {
                         leader = child3;
+                    }
+                    if (compOp(a[leader], Below, a[leader12])) {
+                        leader = leader12;
                     }
                     if (parent != leader) {
                         std::swap(a[parent], a[leader]);
