@@ -34,6 +34,7 @@ int64_t counter;
 
 #include "sortalgo/sortheapbinaryaheadsimplevarianta.hpp"
 #include "sortalgo/sortheapbinaryaheadsimplevariantb.hpp"
+#include "sortalgo/sortheapbinarycached.hpp"
 #include "sortalgo/sortheapbinarycascadingvarianta.hpp"
 #include "sortalgo/sortheapbinarycascadingvariantb.hpp"
 #include "sortalgo/sortheapbinarycascadingvariantc.hpp"
@@ -108,9 +109,11 @@ int main(int argc, char** argv) {
     typ * original;
     typ * sorted;
     typ * work;
+    int8_t * scratchpad;
     posix_memalign((void**) &original, 128, sizeof (typ) * size);
     posix_memalign((void**) &sorted, 128, sizeof (typ) * size);
     posix_memalign((void**) &work, 128, sizeof (typ) * size);
+    posix_memalign((void**) &scratchpad, 128, sizeof (typ) * size);
 
     for (ssize_t i = 0; i < size; i++) {
         sorted[i] = original[i] = rand();
@@ -118,16 +121,22 @@ int main(int argc, char** argv) {
     testFunction("StdSort", original, work, (typ*) nullptr, size, [&]() {
         std::sort(sorted, sorted + size); });
 
-    testFunction("BinaryHeapSortAheadSimpleVariantA",
-            original, work, sorted, size, [&]() {
-                BinaryHeapSortAheadSimpleVariantA<typ, ComparisonOperator>(
-                        work, size);
-            });
+        testFunction("BinaryHeapSortAheadSimpleVariantA",
+                original, work, sorted, size, [&]() {
+                    BinaryHeapSortAheadSimpleVariantA<typ, ComparisonOperator>(
+                            work, size);
+                });
+    
+        testFunction("BinaryHeapSortAheadSimpleVariantB",
+                original, work, sorted, size, [&]() {
+                    BinaryHeapSortAheadSimpleVariantB<typ, ComparisonOperator>(
+                            work, size);
+                });
 
-    testFunction("BinaryHeapSortAheadSimpleVariantB",
+    testFunction("CachedComparisonsBinaryHeapSort",
             original, work, sorted, size, [&]() {
-                BinaryHeapSortAheadSimpleVariantB<typ, ComparisonOperator>(
-                        work, size);
+                CachedComparisonsBinaryHeapSort<typ, ComparisonOperator>(
+                        work, size, scratchpad);
             });
 
     testFunction("BinaryHeapSortCascadingVariantA",

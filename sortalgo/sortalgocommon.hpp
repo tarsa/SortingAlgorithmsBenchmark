@@ -82,6 +82,52 @@ namespace tarsa {
             return 1;
         }
     }
+
+    namespace compileTimeConstArrays {
+        template<class T> using Invoke = typename T::type;
+
+        template<ssize_t...> struct seq {
+            using type = seq;
+        };
+
+        template<class S1, class S2> struct concat;
+
+        template<ssize_t... I1, ssize_t... I2>
+        struct concat<seq<I1...>, seq<I2...>>
+        : seq<I1..., (sizeof...(I1) + I2)...>
+        { };
+
+        template<class S1, class S2>
+        using Concat = Invoke<concat<S1, S2>>;
+
+        template<ssize_t N> 
+        struct gen_seq;
+        
+        template<ssize_t N> 
+        using GenSeq = Invoke<gen_seq<N>>;
+
+        template<ssize_t N>
+        struct gen_seq : Concat<GenSeq<N / 2>, GenSeq<N - N / 2>>
+        { };
+
+        template<> struct gen_seq<0> : seq<> { };
+
+        template<> struct gen_seq<1> : seq<0> { };
+
+        template<ssize_t N, typename T>
+        struct ComputedArray {
+
+            template<ssize_t... Is>
+            ComputedArray(seq<Is...>, T(*F)(ssize_t)) : a{F(Is)...} {
+            }
+
+            const T& operator[](ssize_t idx) const {
+                return a[idx];
+            };
+        private:
+            T const a[N];
+        };
+    }
 }
 
 #endif	/* SORTALGOCOMMON_HPP */
